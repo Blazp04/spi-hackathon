@@ -1,30 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { projectsAPI } from '../services/api';
 import './mint_tokens.css';
 
-const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
+const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmin, onSubmitProject }) => {
+  const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
   const [investmentAmount, setInvestmentAmount] = useState('1,000');
   const [tokensToReceive, setTokensToReceive] = useState(0);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState(project?.id || null);
+  const [loading, setLoading] = useState(true);
 
-  const projectData = project || {
-    name: 'Zagreb Tower A – Phase I',
-    location: 'Zagreb, Croatia',
-    status: 'Minting',
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800',
-    totalBudget: '€750,000',
-    currentlyRaised: '€320,000',
-    percentage: 42.7,
-    remaining: '€430,000',
-    tokenPrice: '€1.00',
-    totalTokenSupply: 750000,
-    tokensMinted: 320000,
-    minInvestment: '€100',
-    daysRemaining: 12
-  };
+  // Fetch projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      try {
+        const data = await projectsAPI.getApproved();
+        const projectsList = data.projects || [];
+        setProjects(projectsList);
+        if (projectsList.length > 0 && !selectedProjectId) {
+          setSelectedProjectId(projectsList[0].id);
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+        const fallbackProjects = [
+          {
+            id: 1,
+            name: 'Zagreb Tower A – Phase I',
+            location: 'Zagreb, Croatia',
+            status: 'Minting',
+            goal: 750000,
+            current_funding: 320000,
+            token_price: 1,
+            images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800']
+          },
+          {
+            id: 2,
+            name: 'Dubrovnik Seaside Villas',
+            location: 'Dubrovnik, Croatia',
+            status: 'Minting',
+            goal: 1200000,
+            current_funding: 450000,
+            token_price: 1.5,
+            images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800']
+          }
+        ];
+        setProjects(fallbackProjects);
+        if (!selectedProjectId) setSelectedProjectId(fallbackProjects[0].id);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, [selectedProjectId]);
+
+  const selectedProject = projects.find(p => p.id === selectedProjectId) || projects[0];
 
   const calculateTokens = (amount) => {
+    if (!selectedProject) return 0;
     const numAmount = parseFloat(amount.replace(/[^0-9.-]+/g, ''));
-    const tokenPrice = parseFloat(projectData.tokenPrice.replace(/[^0-9.-]+/g, ''));
-    return Math.floor(numAmount / tokenPrice);
+    return Math.floor(numAmount / selectedProject.token_price);
   };
 
   const handleAmountChange = (e) => {
@@ -33,86 +69,148 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
     setTokensToReceive(calculateTokens(value));
   };
 
-  const tokenPrice = parseFloat(projectData.tokenPrice.replace(/[^0-9.-]+/g, ''));
-  const platformFee = tokensToReceive * tokenPrice * 0.02; // 2%
-  const gasFee = 3.50;
-  const totalCost = (tokensToReceive * tokenPrice) + platformFee + gasFee;
-
   return (
     <div className="mint-tokens">
-      <div className="mint-header">
-        <div className="container">
-          <div className="header-content">
-            <div className="logo">
-              <span className="logo-icon">PC</span>
-              <span className="logo-text">PropChain</span>
+      <header className="header">
+        <div className="header-content">
+          <div className="logo">
+            <div className="logo-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 22V12H15V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
-            <nav className="nav">
-              <a href="#marketplace" onClick={(e) => { e.preventDefault(); onBack && onBack(); }} className="nav-link">Marketplace</a>
-              <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
-              <a href="#mint-tokens" className="nav-link active">Mint Tokens</a>
-              <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(); }} className="nav-link">Trading</a>
-            </nav>
-            <button className="connect-wallet-btn">Connect Wallet</button>
+            <span className="logo-text">BlockByBlock</span>
+          </div>
+          <nav className="nav">
+            <a href="#marketplace" onClick={(e) => { e.preventDefault(); onBack && onBack(); }} className="nav-link">Marketplace</a>
+            {isAuthenticated && (
+              <a href="#submit" onClick={(e) => { e.preventDefault(); onSubmitProject && onSubmitProject(); }} className="nav-link">Submit Property</a>
+            )}
+            <a href="#mint-tokens" className="nav-link active">Mint Tokens</a>
+            <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(); }} className="nav-link">Trading</a>
+            <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
+            {isAdmin && (
+              <a href="#admin" onClick={(e) => { e.preventDefault(); onAdmin && onAdmin(); }} className="nav-link admin-link">Admin Dashboard</a>
+            )}
+          </nav>
+          <div className="header-actions">
+            {authError && <span className="auth-error">{authError}</span>}
+            {isAuthenticated ? (
+              <div className="user-menu">
+                {isAdmin && <span className="admin-badge">ADMIN</span>}
+                <span className="wallet-display">
+                  {user?.wallet?.slice(0, 6)}...{user?.wallet?.slice(-4)}
+                </span>
+                <button className="disconnect-btn" onClick={disconnect}>
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button 
+                className="connect-wallet-btn" 
+                onClick={connectWallet}
+                disabled={authLoading || !hasMetaMask}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                {authLoading ? 'Connecting...' : hasMetaMask ? 'Connect Wallet' : 'Install MetaMask'}
+              </button>
+            )}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="breadcrumb-section">
+      <div className="project-selector-section">
         <div className="container">
-          <div className="breadcrumb">
-            <span onClick={onBack} className="breadcrumb-link">Marketplace</span>
-            <span className="breadcrumb-separator">/</span>
-            <span onClick={onBack} className="breadcrumb-link">{projectData.name}</span>
-            <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">Mint Tokens</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mint-content">
-        <div className="container">
-          <div className="content-layout">
-            <div className="project-info-section">
-              <div className="project-card">
-                <div className="project-image">
-                  <img src={projectData.image} alt={projectData.name} />
-                  <span className="status-badge">{projectData.status}</span>
+          <h2 className="selector-title">Select Project to Mint Tokens</h2>
+          {loading ? (
+            <div className="loading-state">
+              <p>Loading projects...</p>
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="empty-state">
+              <p>No projects available for minting.</p>
+            </div>
+          ) : (
+            <div className="project-selector">
+              {projects.map((proj) => (
+                <div 
+                  key={proj.id}
+                  className={`project-option ${selectedProjectId === proj.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedProjectId(proj.id)}
+                >
+                  <div className="project-option-image">
+                    <img src={proj.images?.[0] || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400'} alt={proj.name} />
+                  </div>
+                  <div className="project-option-info">
+                    <h3>{proj.name}</h3>
+                    <p>{proj.location}</p>
+                    <span className="project-option-price">Token: €{proj.token_price}</span>
+                  </div>
+                  {selectedProjectId === proj.id && (
+                    <div className="selected-check">✓</div>
+                  )}
                 </div>
-                <div className="project-details">
-                  <h2 className="project-name">{projectData.name}</h2>
-                  <div className="project-stats">
-                    <div className="stat-item">
-                      <span className="stat-label">Total Budget</span>
-                      <span className="stat-value">{projectData.totalBudget}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {selectedProject && (
+        <div className="mint-content">
+          <div className="container">
+            <div className="content-layout">
+              <div className="left-column">
+                <div className="project-preview-card">
+                  <div className="project-preview-image">
+                    <img src={selectedProject.images?.[0] || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800'} alt={selectedProject.name} />
+                    <span className="status-badge-preview">{selectedProject.status}</span>
+                  </div>
+                  <div className="location-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="10" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span>{selectedProject.location}</span>
+                  </div>
+                  <h2 className="project-preview-name">{selectedProject.name}</h2>
+                  
+                  <div className="budget-info">
+                    <div className="budget-item">
+                      <span className="budget-label">Total Budget</span>
+                      <span className="budget-value">€{selectedProject.goal?.toLocaleString()}</span>
                     </div>
-                    <div className="stat-item">
-                      <span className="stat-label">Currently Raised</span>
-                      <span className="stat-value">{projectData.currentlyRaised}</span>
+                    <div className="budget-item">
+                      <span className="budget-label">Currently Raised</span>
+                      <span className="budget-value raised">€{selectedProject.current_funding?.toLocaleString()}</span>
                     </div>
                   </div>
-                  <div className="progress-section">
-                    <div className="progress-header">
-                      <span>{projectData.percentage}% Complete</span>
-                      <span>{projectData.remaining} remaining</span>
+
+                  <div className="progress-info">
+                    <div className="progress-label-row">
+                      <span className="progress-percentage">{((selectedProject.current_funding / selectedProject.goal) * 100).toFixed(1)}% Complete</span>
+                      <span className="progress-remaining">€{(selectedProject.goal - selectedProject.current_funding).toLocaleString()} remaining</span>
                     </div>
-                    <div className="progress-bar">
+                    <div className="progress-bar-preview">
                       <div 
-                        className="progress-fill" 
-                        style={{width: `${projectData.percentage}%`}}
+                        className="progress-fill-preview" 
+                        style={{width: `${((selectedProject.current_funding / selectedProject.goal) * 100).toFixed(1)}%`}}
                       ></div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mint-form-section">
+            <div className="right-column">
               <div className="alert-warning">
                 <div className="alert-icon">⚠</div>
                 <div className="alert-content">
                   <div className="alert-title">Minting period ends on March 15, 2024</div>
-                  <div className="alert-text">Only {projectData.daysRemaining} days remaining to participate in this investment opportunity</div>
+                  <div className="alert-text">Limited time to participate in this investment opportunity</div>
                 </div>
               </div>
 
@@ -121,15 +219,15 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
 
                 <div className="token-stats">
                   <div className="token-stat">
-                    <div className="token-stat-value">{projectData.tokenPrice}</div>
+                    <div className="token-stat-value">€{selectedProject.token_price}</div>
                     <div className="token-stat-label">Current Token Price</div>
                   </div>
                   <div className="token-stat">
-                    <div className="token-stat-value">{projectData.totalTokenSupply.toLocaleString()}</div>
+                    <div className="token-stat-value">{(selectedProject.goal / selectedProject.token_price).toLocaleString()}</div>
                     <div className="token-stat-label">Total Token Supply</div>
                   </div>
                   <div className="token-stat">
-                    <div className="token-stat-value success">{projectData.tokensMinted.toLocaleString()}</div>
+                    <div className="token-stat-value success">{Math.floor(selectedProject.current_funding / selectedProject.token_price).toLocaleString()}</div>
                     <div className="token-stat-label">Tokens Minted</div>
                   </div>
                 </div>
@@ -146,7 +244,7 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
                     />
                     <span className="input-currency">EUR</span>
                   </div>
-                  <div className="form-hint">Minimum investment: {projectData.minInvestment}</div>
+                  <div className="form-hint">Minimum investment: €100</div>
                 </div>
 
                 <div className="receive-section">
@@ -159,19 +257,19 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
                   <div className="transaction-list">
                     <div className="transaction-row">
                       <span className="transaction-label">Token Price</span>
-                      <span className="transaction-value">€{tokenPrice.toFixed(2)}</span>
+                      <span className="transaction-value">€{selectedProject.token_price.toFixed(2)}</span>
                     </div>
                     <div className="transaction-row">
                       <span className="transaction-label">Platform Fee (2%)</span>
-                      <span className="transaction-value">€{platformFee.toFixed(2)}</span>
+                      <span className="transaction-value">€{(tokensToReceive * selectedProject.token_price * 0.02).toFixed(2)}</span>
                     </div>
                     <div className="transaction-row">
                       <span className="transaction-label">Gas Fee (Est.)</span>
-                      <span className="transaction-value">€{gasFee.toFixed(2)}</span>
+                      <span className="transaction-value">€3.50</span>
                     </div>
                     <div className="transaction-row total">
                       <span className="transaction-label">Total Cost</span>
-                      <span className="transaction-value">€{totalCost.toFixed(2)}</span>
+                      <span className="transaction-value">€{((tokensToReceive * selectedProject.token_price) + (tokensToReceive * selectedProject.token_price * 0.02) + 3.50).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -181,10 +279,11 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading }) => {
                   <button className="btn-primary">Confirm Investment</button>
                 </div>
               </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

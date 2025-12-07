@@ -79,6 +79,8 @@ function AppContent() {
           onTrading={handleTrading}
           onMarket2={handleBackToMarketplace}
           onPortfolio={handlePortfolio}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'mint' && (
@@ -88,6 +90,8 @@ function AppContent() {
           onMarket2={handleBackToMarketplace}
           onPortfolio={handlePortfolio}
           onTrading={handleTrading}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'trading' && (

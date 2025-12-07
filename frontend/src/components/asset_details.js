@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import './asset_details.css';
 
-const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onPortfolio }) => {
+const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onPortfolio, onAdmin, onSubmitProject }) => {
+  const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
 
   const projectData = project || {
@@ -89,19 +91,41 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
           </div>
           <nav className="nav">
             <a href="#marketplace" onClick={(e) => { e.preventDefault(); onBack && onBack(); }} className="nav-link">Marketplace</a>
-            <a href="#projects" onClick={(e) => { e.preventDefault(); onMarket2 && onMarket2(); }} className="nav-link">Projects</a>
-            <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
+            {isAuthenticated && (
+              <a href="#submit" onClick={(e) => { e.preventDefault(); onSubmitProject && onSubmitProject(); }} className="nav-link">Submit Property</a>
+            )}
             <a href="#mint-tokens" onClick={(e) => { e.preventDefault(); onMintTokens && onMintTokens(projectData); }} className="nav-link">Mint Tokens</a>
             <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(projectData); }} className="nav-link">Trading</a>
+            <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
+            {isAdmin && (
+              <a href="#admin" onClick={(e) => { e.preventDefault(); onAdmin && onAdmin(); }} className="nav-link admin-link">Admin Dashboard</a>
+            )}
           </nav>
           <div className="header-actions">
-            <button className="connect-wallet-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
-              Connect Wallet
-            </button>
+            {authError && <span className="auth-error">{authError}</span>}
+            {isAuthenticated ? (
+              <div className="user-menu">
+                {isAdmin && <span className="admin-badge">ADMIN</span>}
+                <span className="wallet-display">
+                  {user?.wallet?.slice(0, 6)}...{user?.wallet?.slice(-4)}
+                </span>
+                <button className="disconnect-btn" onClick={disconnect}>
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button 
+                className="connect-wallet-btn" 
+                onClick={connectWallet}
+                disabled={authLoading || !hasMetaMask}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                {authLoading ? 'Connecting...' : hasMetaMask ? 'Connect Wallet' : 'Install MetaMask'}
+              </button>
+            )}
           </div>
         </div>
       </header>

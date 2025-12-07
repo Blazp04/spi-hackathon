@@ -20,21 +20,22 @@
 }
 
 .header-content {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 48px;
+  gap: 20px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
   transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
 .logo:hover {
@@ -43,43 +44,48 @@
 
 .logo-icon {
   background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .logo-text {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
+  white-space: nowrap;
 }
 
 .nav {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   flex: 1;
   justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .nav-link {
   color: #64748b;
   text-decoration: none !important;
-  font-size: 14px;
-  padding: 8px 0;
+  font-size: 13px;
+  padding: 6px 0;
   transition: all 0.2s ease;
   font-weight: 500;
   background: none;
   border: none;
   position: relative;
   border-bottom: none !important;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-link::after {
