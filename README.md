@@ -2,6 +2,13 @@
 
 > Blockchain platform for tokenized real estate construction financing
 
+## Team Members
+
+- **Antonija Kožul**
+- **Jelena Vučić**
+- **Blaž Perić**
+- **Oliver Vujica**
+
 ## Project Overview
 
 PropertyBuild is a decentralized platform that enables investors to participate in construction project financing through token purchases. The platform uses smart contracts to automate the entire project lifecycle - from fundraising, through construction progress tracking, to profit distribution after property sale.
@@ -176,19 +183,68 @@ Contractor → Submits request → Verifiers review →
 
 ## 🚀 Getting Started
 
+### Backend Setup
+
 ```bash
+# Navigate to backend directory
+cd backend
+
 # Install dependencies
+npm install
+
+# Configure environment variables
+# Create .env file with:
+# DATABASE_URL=postgresql://username:password@localhost:5432/propertybuildb
+# JWT_SECRET=your_secret_key
+# PORT=3001
+
+# Initialize database
+node src/db/init.js
+
+# Add test data (optional)
+node src/db/add_test_data.js
+
+# Start backend server
+npm start
+# Server runs on http://localhost:3001
+```
+
+### Frontend Setup
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+# Application runs on http://localhost:3000
+```
+
+### Smart Contract Development
+
+```bash
+# Install Foundry dependencies
 forge install
 
-# Build
+# Build contracts
 forge build
 
-# Test
+# Run tests
 forge test
 
 # Deployment (Sepolia testnet)
 forge script script/DeployPropertyBuild.s.sol --rpc-url $SEPOLIA_RPC --broadcast
 ```
+
+### Prerequisites
+
+- **Node.js** (v16 or higher)
+- **PostgreSQL** (v12 or higher)
+- **MetaMask** browser extension
+- **Foundry** (for smart contract development)
 
 ## 📜 License
 
