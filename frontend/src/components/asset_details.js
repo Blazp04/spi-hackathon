@@ -320,66 +320,139 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
 
             <aside className="content-sidebar">
               <div className="info-card">
-                <h3 className="info-card-title">Token Information</h3>
-                <div className="info-list">
-                  <div className="info-row">
-                    <span className="info-label">Total Supply</span>
-                    <span className="info-value">{formatNumber('750,000')} USDT</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Minted</span>
-                    <span className="info-value">{formatNumber('320,000')} USDT</span>
-                  </div>
-                </div>
-                <div style={{
-                  background: '#fef3c7',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  marginTop: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <span style={{color: '#f59e0b', fontSize: '16px'}}>⏰</span>
-                  <div>
-                    <div style={{color: '#f59e0b', fontSize: '12px', fontWeight: '500'}}>Minting ends in</div>
-                    <div style={{color: '#f59e0b', fontSize: '18px', fontWeight: '700'}}>15 days</div>
-                  </div>
-                </div>
-                <button 
-                  className="mint-button" 
-                  onClick={() => onMintTokens && onMintTokens(projectData)}
-                  style={{
-                    background: '#1e40af',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    width: '100%',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    marginTop: '12px'
-                  }}>
-                  Mint Tokens
-                </button>
-                <button 
-                  className="trade-button" 
-                  onClick={() => onTrading && onTrading(projectData)}
-                  style={{
-                    background: 'white',
-                    color: '#1e40af',
-                    border: '2px solid #1e40af',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    width: '100%',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    marginTop: '8px'
-                  }}>
-                  Trade Tokens
-                </button>
+                {projectData.status === 'finished' ? (
+                  <>
+                    <h3 className="info-card-title">Project Completion</h3>
+                    <div style={{
+                      background: '#d1fae5',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px'
+                    }}>
+                      <span style={{color: '#10b981', fontSize: '32px'}}>✓</span>
+                      <div>
+                        <div style={{color: '#10b981', fontSize: '14px', fontWeight: '700', marginBottom: '4px'}}>Project Completed</div>
+                        <div style={{color: '#059669', fontSize: '12px'}}>Construction finished successfully</div>
+                      </div>
+                    </div>
+                    <div className="info-list">
+                      <div className="info-row">
+                        <span className="info-label">Completion Date</span>
+                        <span className="info-value">December 2024</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Total Invested</span>
+                        <span className="info-value">{formatNumber('750,000')} USDT</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Total Investors</span>
+                        <span className="info-value">127</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Property Status</span>
+                        <span className="info-value" style={{color: '#10b981', fontWeight: '600'}}>Ready</span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => onPortfolio && onPortfolio()}
+                      style={{
+                        background: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        width: '100%',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        marginTop: '12px'
+                      }}>
+                      View in Portfolio
+                    </button>
+                    <button 
+                      onClick={() => onTrading && onTrading(projectData)}
+                      style={{
+                        background: 'white',
+                        color: '#10b981',
+                        border: '2px solid #10b981',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        width: '100%',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        marginTop: '8px'
+                      }}>
+                      Trade Tokens
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="info-card-title">Token Information</h3>
+                    <div className="info-list">
+                      <div className="info-row">
+                        <span className="info-label">Total Supply</span>
+                        <span className="info-value">{formatNumber('750,000')} USDT</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Minted</span>
+                        <span className="info-value">{formatNumber('320,000')} USDT</span>
+                      </div>
+                    </div>
+                    <div style={{
+                      background: '#fef3c7',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      marginTop: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{color: '#f59e0b', fontSize: '16px'}}>⏰</span>
+                      <div>
+                        <div style={{color: '#f59e0b', fontSize: '12px', fontWeight: '500'}}>Minting ends in</div>
+                        <div style={{color: '#f59e0b', fontSize: '18px', fontWeight: '700'}}>15 days</div>
+                      </div>
+                    </div>
+                    <button 
+                      className="mint-button" 
+                      onClick={() => onMintTokens && onMintTokens(projectData)}
+                      style={{
+                        background: '#1e40af',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        width: '100%',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        marginTop: '12px'
+                      }}>
+                      Mint Tokens
+                    </button>
+                    <button 
+                      className="trade-button" 
+                      onClick={() => onTrading && onTrading(projectData)}
+                      style={{
+                        background: 'white',
+                        color: '#1e40af',
+                        border: '2px solid #1e40af',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        width: '100%',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        marginTop: '8px'
+                      }}>
+                      Trade Tokens
+                    </button>
+                  </>
+                )}
               </div>
 
               <div className="info-card">

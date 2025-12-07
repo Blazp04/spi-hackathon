@@ -11,6 +11,7 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
     minting: true,
     building: true,
     trading: true,
+    finished: true,
     pending: false,
     location: 'All Cities',
     propertyType: 'all',
@@ -70,6 +71,7 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
     if (filters.minting && project.status === 'minting') return true;
     if (filters.building && project.status === 'building') return true;
     if (filters.trading && project.status === 'trading') return true;
+    if (filters.finished && project.status === 'finished') return true;
     if (filters.pending && project.status === 'pending' && isAdmin) return true;
     return false;
   });
@@ -196,6 +198,15 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                     <span>Trading</span>
                     <span className="filter-count filter-count-purple">{projects.filter(p => p.status === 'trading').length}</span>
                   </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={filters.finished}
+                      onChange={(e) => setFilters({...filters, finished: e.target.checked})}
+                    />
+                    <span>Finished</span>
+                    <span className="filter-count filter-count-gray">{projects.filter(p => p.status === 'finished').length}</span>
+                  </label>
                   {isAdmin && (
                     <label className="checkbox-label">
                       <input
@@ -309,7 +320,8 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                 ) : (
                   filteredProjects.map((project, index) => {
                     console.table(project);
-                    const progressPercentage = index === 0 ? 43 : 60;
+                    const progressPercentage = project.status === 'finished' ? 100 : (index === 0 ? 43 : 60);
+                    const progressColor = project.status === 'finished' ? '#10b981' : '#3b82f6';
                     return (
                       <div key={project.id} className="project-card1">
                         <div className="project-image">
@@ -342,7 +354,7 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                           <div style={{marginTop: '16px', marginBottom: '16px'}}>
                             <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px'}}>
                               <span style={{fontSize: '13px', color: '#64748b'}}>Progress</span>
-                              <span style={{fontSize: '14px', fontWeight: '600', color: '#1e293b'}}>{progressPercentage}%</span>
+                              <span style={{fontSize: '14px', fontWeight: '600', color: project.status === 'finished' ? '#10b981' : '#1e293b'}}>{progressPercentage}%</span>
                             </div>
                             <div style={{
                               width: '100%',
@@ -354,7 +366,7 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                               <div style={{
                                 width: `${progressPercentage}%`,
                                 height: '100%',
-                                background: '#3b82f6',
+                                background: progressColor,
                                 borderRadius: '4px'
                               }}></div>
                             </div>
