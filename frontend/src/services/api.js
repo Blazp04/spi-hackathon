@@ -98,6 +98,31 @@ export const projectsAPI = {
     return res.json();
   },
 
+  changeStatus: async (id, status) => {
+    const res = await fetch(`${API_URL}/projects/${id}/change-status`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) throw new Error('Failed to change status');
+    return res.json();
+  },
+
+  delete: async (id) => {
+    const res = await fetch(`${API_URL}/projects/${id}`, {
+      method: 'DELETE',
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      }
+    });
+    if (!res.ok) throw new Error('Failed to delete project');
+    return res.json();
+  },
+
   getMyProjects: async () => {
     const res = await fetch(`${API_URL}/projects/user/my-projects`, {
       headers: { ...getAuthHeaders() }

@@ -400,6 +400,11 @@
   color: #c2410c;
 }
 
+.filter-count-purple {
+  background: #e9d5ff;
+  color: #7c3aed;
+}
+
 .filter-count-green {
   background: #d1fae5;
   color: #047857;
@@ -621,7 +626,7 @@
 }
 
 .status-badge.trading {
-  background-color: #10b981;
+  background-color: #8b5cf6;
 }
 
 .project-content {
@@ -874,10 +879,29 @@
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
-.status-badge.pending {
+.status-badge.minting {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.status-badge.building {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.status-badge.pending {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
 }
 
 .status-badge.rejected {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* Filter count colors */
+.filter-count-yellow {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.filter-count-blue {
+  background: #dbeafe;
+  color: #1e40af;
 }

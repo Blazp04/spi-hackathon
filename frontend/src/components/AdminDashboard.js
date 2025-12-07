@@ -58,6 +58,40 @@ const AdminDashboard = ({ onBack }) => {
     }
   };
 
+  const handleChangeStatus = async (projectId, newStatus) => {
+    if (!window.confirm(`Change project status to "${newStatus}"?`)) {
+      return;
+    }
+    
+    setActionLoading(projectId);
+    try {
+      await projectsAPI.changeStatus(projectId, newStatus);
+      await loadProjects();
+    } catch (error) {
+      console.error('Failed to change status:', error);
+      alert('Failed to change project status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async (projectId) => {
+    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      return;
+    }
+    
+    setActionLoading(projectId);
+    try {
+      await projectsAPI.delete(projectId);
+      await loadProjects();
+    } catch (error) {
+      console.error('Failed to delete:', error);
+      alert('Failed to delete project');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const formatPrice = (price) => {
     if (!price) return 'N/A';
     return `€${Number(price).toLocaleString()}`;
@@ -67,7 +101,10 @@ const AdminDashboard = ({ onBack }) => {
     const colors = {
       pending: 'badge-yellow',
       approved: 'badge-green',
-      rejected: 'badge-red'
+      rejected: 'badge-red',
+      minting: 'badge-blue',
+      building: 'badge-orange',
+      trading: 'badge-purple'
     };
     return colors[status] || 'badge-gray';
   };
@@ -153,7 +190,7 @@ const AdminDashboard = ({ onBack }) => {
                   <th>Owner</th>
                   <th>Status</th>
                   <th>Created</th>
-                  {activeTab === 'pending' && <th>Actions</th>}
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,29 +205,54 @@ const AdminDashboard = ({ onBack }) => {
                       {project.owner_wallet?.slice(0, 6)}...{project.owner_wallet?.slice(-4)}
                     </td>
                     <td>
-                      <span className={`status-badge ${getStatusBadge(project.status)}`}>
-                        {project.status}
-                      </span>
+                      <div className="status-actions">
+                        <span className={`badge ${getStatusBadge(project.status)}`}>
+                          {project.status}
+                        </span>
+                        <select 
+                          className="status-select"
+                          value={project.status}
+                          onChange={(e) => handleChangeStatus(project.id, e.target.value)}
+                          disabled={actionLoading === project.id}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="minting">Minting</option>
+                          <option value="building">Building</option>
+                          <option value="trading">Trading</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
                     </td>
                     <td>{new Date(project.created_at).toLocaleDateString()}</td>
-                    {activeTab === 'pending' && (
-                      <td className="actions-cell">
-                        <button 
-                          className="approve-btn"
-                          onClick={() => handleApprove(project.id)}
-                          disabled={actionLoading === project.id}
-                        >
-                          {actionLoading === project.id ? '...' : '✓ Approve'}
-                        </button>
-                        <button 
-                          className="reject-btn"
-                          onClick={() => handleReject(project.id)}
-                          disabled={actionLoading === project.id}
-                        >
-                          {actionLoading === project.id ? '...' : '✕ Reject'}
-                        </button>
-                      </td>
-                    )}
+                    <td className="actions-cell">
+                      {activeTab === 'pending' && (
+                        <>
+                          <button 
+                            className="approve-btn"
+                            onClick={() => handleApprove(project.id)}
+                            disabled={actionLoading === project.id}
+                          >
+                            {actionLoading === project.id ? '...' : '✓ Approve'}
+                          </button>
+                          <button 
+                            className="reject-btn"
+                            onClick={() => handleReject(project.id)}
+                            disabled={actionLoading === project.id}
+                          >
+                            {actionLoading === project.id ? '...' : '✕ Reject'}
+                          </button>
+                        </>
+                      )}
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleDelete(project.id)}
+                        disabled={actionLoading === project.id}
+                        title="Delete project"
+                      >
+                        {actionLoading === project.id ? '...' : '🗑️'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

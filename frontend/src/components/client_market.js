@@ -8,6 +8,9 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
   
   const [filters, setFilters] = useState({
     approved: true,
+    minting: true,
+    building: true,
+    trading: true,
     pending: false,
     location: 'All Cities',
     propertyType: 'all',
@@ -23,13 +26,8 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        if (isAdmin && filters.pending) {
-          const data = await projectsAPI.getAll();
-          setProjects(data.projects || []);
-        } else {
-          const data = await projectsAPI.getApproved();
-          setProjects(data.projects || []);
-        }
+        const data = await projectsAPI.getAll();
+        setProjects(data.projects || []);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
         setProjects([
@@ -63,6 +61,9 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
 
   const filteredProjects = projects.filter(project => {
     if (filters.approved && project.status === 'approved') return true;
+    if (filters.minting && project.status === 'minting') return true;
+    if (filters.building && project.status === 'building') return true;
+    if (filters.trading && project.status === 'trading') return true;
     if (filters.pending && project.status === 'pending' && isAdmin) return true;
     return false;
   });
@@ -160,6 +161,33 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                     <span>Approved</span>
                     <span className="filter-count filter-count-green">{projects.filter(p => p.status === 'approved').length}</span>
                   </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={filters.minting}
+                      onChange={(e) => setFilters({...filters, minting: e.target.checked})}
+                    />
+                    <span>Minting</span>
+                    <span className="filter-count filter-count-blue">{projects.filter(p => p.status === 'minting').length}</span>
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={filters.building}
+                      onChange={(e) => setFilters({...filters, building: e.target.checked})}
+                    />
+                    <span>Building</span>
+                    <span className="filter-count filter-count-orange">{projects.filter(p => p.status === 'building').length}</span>
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={filters.trading}
+                      onChange={(e) => setFilters({...filters, trading: e.target.checked})}
+                    />
+                    <span>Trading</span>
+                    <span className="filter-count filter-count-purple">{projects.filter(p => p.status === 'trading').length}</span>
+                  </label>
                   {isAdmin && (
                     <label className="checkbox-label">
                       <input
@@ -168,7 +196,7 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                         onChange={(e) => setFilters({...filters, pending: e.target.checked})}
                       />
                       <span>Pending</span>
-                      <span className="filter-count filter-count-orange">{projects.filter(p => p.status === 'pending').length}</span>
+                      <span className="filter-count filter-count-yellow">{projects.filter(p => p.status === 'pending').length}</span>
                     </label>
                   )}
                 </div>

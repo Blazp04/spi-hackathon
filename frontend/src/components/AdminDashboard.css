@@ -1,13 +1,19 @@
 .admin-dashboard {
   min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #f5f7fa;
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .admin-header {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-bottom: 1px solid #334155;
-  padding: 1rem 2rem;
+  background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .admin-header-content {
@@ -25,49 +31,56 @@
 }
 
 .back-btn {
-  background: transparent;
-  border: 1px solid #475569;
-  color: #94a3b8;
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #64748b;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 500;
 }
 
 .back-btn:hover {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: #f9fafb;
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: translateY(-1px);
 }
 
 .admin-title-section h1 {
   margin: 0;
   font-size: 1.5rem;
-  color: #f1f5f9;
+  font-weight: 700;
+  color: #1e293b;
 }
 
 .admin-badge {
   background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 .wallet-address {
-  background: #1e293b;
+  background: #f1f5f9;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-family: monospace;
+  font-family: 'Monaco', 'Consolas', monospace;
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: #64748b;
+  border: 1px solid #e5e7eb;
 }
 
 .admin-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 32px;
 }
 
 .admin-stats {
@@ -78,24 +91,35 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid #334155;
-  border-radius: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .stat-number {
   display: block;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #3b82f6;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .admin-tabs {
@@ -105,24 +129,27 @@
 }
 
 .tab-btn {
-  background: transparent;
-  border: 1px solid #334155;
-  color: #94a3b8;
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #64748b;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .tab-btn:hover {
-  background: #1e293b;
+  background: #f9fafb;
+  border-color: #cbd5e1;
 }
 
 .tab-btn.active {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   border-color: #3b82f6;
   color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .loading-state,
@@ -131,13 +158,17 @@
   padding: 4rem 2rem;
   color: #64748b;
   font-size: 1.1rem;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
 }
 
 .projects-table-container {
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid #334155;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .projects-table {
@@ -146,99 +177,156 @@
 }
 
 .projects-table th {
-  background: #0f172a;
+  background: #f9fafb;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #94a3b8;
+  color: #475569;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .projects-table td {
   padding: 1rem;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #f1f5f9;
   font-size: 0.875rem;
+  color: #64748b;
+}
+
+.projects-table tbody tr {
+  transition: background 0.2s;
 }
 
 .projects-table tbody tr:hover {
-  background: rgba(59, 130, 246, 0.05);
+  background: #f9fafb;
 }
 
 .project-name {
-  font-weight: 500;
-  color: #f1f5f9;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .wallet-cell {
-  font-family: monospace;
+  font-family: 'Monaco', 'Consolas', monospace;
   color: #64748b;
+  font-size: 0.8rem;
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: capitalize;
+  display: inline-block;
 }
 
 .badge-yellow {
-  background: rgba(234, 179, 8, 0.2);
-  color: #eab308;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #92400E;
 }
 
 .badge-green {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #065F46;
 }
 
 .badge-red {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #991B1B;
 }
 
 .badge-gray {
-  background: rgba(100, 116, 139, 0.2);
-  color: #64748b;
+  background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+  color: #475569;
+}
+
+.badge-blue {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  color: #1E40AF;
+}
+
+.badge-orange {
+  background: linear-gradient(135deg, #FFEDD5 0%, #FED7AA 100%);
+  color: #9A3412;
+}
+
+.badge-purple {
+  background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+  color: #6B21A8;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-select {
+  padding: 0.4rem 0.75rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #1e293b;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-select:hover:not(:disabled) {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.status-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .actions-cell {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .approve-btn,
 .reject-btn {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   border: none;
 }
 
 .approve-btn {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
 }
 
 .approve-btn:hover:not(:disabled) {
-  background: #22c55e;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
 }
 
 .reject-btn {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
 }
 
 .reject-btn:hover:not(:disabled) {
-  background: #ef4444;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .approve-btn:disabled,
@@ -247,9 +335,38 @@
   cursor: not-allowed;
 }
 
+.delete-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #FCA5A5;
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1024px) {
   .admin-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-content {
+    padding: 1.5rem 16px;
+  }
+
+  .admin-header {
+    padding: 14px 16px;
   }
 }
 
@@ -265,5 +382,9 @@
 
   .projects-table-container {
     overflow-x: auto;
+  }
+
+  .admin-title-section h1 {
+    font-size: 1.25rem;
   }
 }
