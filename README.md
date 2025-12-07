@@ -4,10 +4,10 @@
 
 ## Team Members
 
-- **Antonija Kožul**
-- **Jelena Vučić**
-- **Blaž Perić**
-- **Oliver Vujica**
+- **Antonija Kožul** (@antonijakozul)
+- **Jelena Vučić** (@jelena_vucic)
+- **Blaž Perić** (@blazperic)
+- **Oliver Vujica** (@olivervja)
 
 ## Project Overview
 
