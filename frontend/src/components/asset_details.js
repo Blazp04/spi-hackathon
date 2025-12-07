@@ -6,6 +6,25 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
   const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
 
+  const formatNumber = (num) => {
+    if (num === null || num === undefined) {
+      return '';
+    }
+    if (typeof num === 'string') {
+      const matches = num.match(/[\d,]+/);
+      if (matches) {
+        const cleanNum = matches[0].replace(/,/g, '');
+        const formatted = Number(cleanNum).toLocaleString('en-US');
+        return num.replace(matches[0], formatted);
+      }
+      return num;
+    }
+    if (typeof num === 'number') {
+      return num.toLocaleString('en-US');
+    }
+    return String(num);
+  };
+
   const projectData = project || {
     name: 'Zagreb Tower A – Phase I',
     description: 'Premium residential development in the heart of Zagreb business district. 120 luxury apartments with modern amenities.',
@@ -54,9 +73,7 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
     {
       phase: 'Interior Construction',
       status: 'In Progress',
-      description: 'Apartment interiors, plumbing, and electrical systems',
       amount: '€320,000',
-      info: '65% Complete',
       percentage: 65
     },
     {
@@ -154,11 +171,11 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
               <h1 className="hero-title">{projectData.name}</h1>
               <div className="hero-stats-cards">
                 <div className="hero-stat-card">
-                  <div className="hero-stat-value orange">{projectData.goal}</div>
+                  <div className="hero-stat-value orange">{formatNumber(projectData.goal)}</div>
                   <div className="hero-stat-label">Total Budget</div>
                 </div>
                 <div className="hero-stat-card">
-                  <div className="hero-stat-value green">{projectData.raised}</div>
+                  <div className="hero-stat-value green">{formatNumber(projectData.raised)}</div>
                   <div className="hero-stat-label">Raised</div>
                 </div>
                 <div className="hero-stat-card">
@@ -225,28 +242,28 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
 
                   <div>
                     <h3 style={{fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '16px'}}>
-                      Investment Highlights
+                      Property Details
                     </h3>
                     <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
                       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📈</span>
-                        <span style={{color: '#64748b', fontSize: '14px'}}>Prime location</span>
+                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📍</span>
+                        <span style={{color: '#64748b', fontSize: '14px'}}>Ulica Savska 25, Zagreb</span>
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📈</span>
-                        <span style={{color: '#64748b', fontSize: '14px'}}>High rental demand</span>
+                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📋</span>
+                        <span style={{color: '#64748b', fontSize: '14px'}}>Parcel ID: KO-ZG-2024-1547</span>
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📈</span>
-                        <span style={{color: '#64748b', fontSize: '14px'}}>Strong appreciation potential</span>
+                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📐</span>
+                        <span style={{color: '#64748b', fontSize: '14px'}}>Land Area: 3,200 m²</span>
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📈</span>
-                        <span style={{color: '#64748b', fontSize: '14px'}}>Experienced developer</span>
+                        <span style={{color: '#f59e0b', fontSize: '16px'}}>🏗️</span>
+                        <span style={{color: '#64748b', fontSize: '14px'}}>Building Permit: GP-2024-0847</span>
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📈</span>
-                        <span style={{color: '#64748b', fontSize: '14px'}}>Transparent blockchain tracking</span>
+                        <span style={{color: '#f59e0b', fontSize: '16px'}}>📄</span>
+                        <span style={{color: '#64748b', fontSize: '14px'}}>Cadastral Municipality: Zagreb-Centar</span>
                       </div>
                     </div>
                   </div>
@@ -306,20 +323,12 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
                 <h3 className="info-card-title">Token Information</h3>
                 <div className="info-list">
                   <div className="info-row">
-                    <span className="info-label">Token Price</span>
-                    <span className="info-value">€1.00</span>
-                  </div>
-                  <div className="info-row">
                     <span className="info-label">Total Supply</span>
-                    <span className="info-value">750,000 ZTA</span>
+                    <span className="info-value">{formatNumber('750,000')} USDT</span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Minted</span>
-                    <span className="info-value">320,000 ZTA</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Available</span>
-                    <span className="info-value" style={{color: '#10b981'}}>430,000 ZTA</span>
+                    <span className="info-value">{formatNumber('320,000')} USDT</span>
                   </div>
                 </div>
                 <div style={{
@@ -337,32 +346,38 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
                     <div style={{color: '#f59e0b', fontSize: '18px', fontWeight: '700'}}>15 days</div>
                   </div>
                 </div>
-                <button className="mint-button" style={{
-                  background: '#1e40af',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  width: '100%',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  marginTop: '12px'
-                }}>
+                <button 
+                  className="mint-button" 
+                  onClick={() => onMintTokens && onMintTokens(projectData)}
+                  style={{
+                    background: '#1e40af',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    width: '100%',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    marginTop: '12px'
+                  }}>
                   Mint Tokens
                 </button>
-                <button className="trade-button" style={{
-                  background: 'white',
-                  color: '#1e40af',
-                  border: '2px solid #1e40af',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  width: '100%',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  marginTop: '8px'
-                }}>
+                <button 
+                  className="trade-button" 
+                  onClick={() => onTrading && onTrading(projectData)}
+                  style={{
+                    background: 'white',
+                    color: '#1e40af',
+                    border: '2px solid #1e40af',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    width: '100%',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    marginTop: '8px'
+                  }}>
                   Trade Tokens
                 </button>
               </div>
@@ -390,27 +405,27 @@ const AssetDetails = ({ project, onBack, onMintTokens, onTrading, onMarket2, onP
                     }}></div>
                   </div>
                   <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '6px'}}>
-                    <span style={{fontSize: '12px', color: '#64748b'}}>€320,000</span>
-                    <span style={{fontSize: '12px', color: '#64748b'}}>€750,000</span>
+                    <span style={{fontSize: '12px', color: '#64748b'}}>€{formatNumber('320000')}</span>
+                    <span style={{fontSize: '12px', color: '#64748b'}}>€{formatNumber('750000')}</span>
                   </div>
                 </div>
 
                 <div className="info-list">
                   <div className="info-row">
                     <span className="info-label">Total Budget</span>
-                    <span className="info-value" style={{fontWeight: '700'}}>€750,000</span>
+                    <span className="info-value" style={{fontWeight: '700'}}>€{formatNumber('750000')}</span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Raised</span>
-                    <span className="info-value" style={{color: '#10b981', fontWeight: '700'}}>€320,000</span>
+                    <span className="info-value" style={{color: '#10b981', fontWeight: '700'}}>€{formatNumber('320000')}</span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Remaining</span>
-                    <span className="info-value" style={{fontWeight: '700'}}>€430,000</span>
+                    <span className="info-value" style={{fontWeight: '700'}}>€{formatNumber('430000')}</span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Contingency</span>
-                    <span className="info-value" style={{fontWeight: '700'}}>€50,000</span>
+                    <span className="info-value" style={{fontWeight: '700'}}>€{formatNumber('50000')}</span>
                   </div>
                 </div>
               </div>

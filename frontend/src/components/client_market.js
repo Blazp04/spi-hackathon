@@ -307,8 +307,9 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                 ) : filteredProjects.length === 0 ? (
                   <div className="empty-message">No projects found. {!isAuthenticated && 'Connect wallet to submit a property.'}</div>
                 ) : (
-                  filteredProjects.map(project => {
+                  filteredProjects.map((project, index) => {
                     console.table(project);
+                    const progressPercentage = index === 0 ? 43 : 60;
                     return (
                       <div key={project.id} className="project-card1">
                         <div className="project-image">
@@ -329,16 +330,33 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                           
                           <div className="project-details">
                             <div className="detail-item">
-                              <span className="detail-label">Token Price</span>
-                              <span className="detail-value">{formatPrice(project.token_price)}</span>
-                            </div>
-                            <div className="detail-item">
                               <span className="detail-label">Goal</span>
                               <span className="detail-value">{formatPrice(project.goal)}</span>
                             </div>
                             <div className="detail-item">
                               <span className="detail-label">Min. Investment</span>
                               <span className="detail-value">{formatPrice(project.min_investment)}</span>
+                            </div>
+                          </div>
+
+                          <div style={{marginTop: '16px', marginBottom: '16px'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px'}}>
+                              <span style={{fontSize: '13px', color: '#64748b'}}>Progress</span>
+                              <span style={{fontSize: '14px', fontWeight: '600', color: '#1e293b'}}>{progressPercentage}%</span>
+                            </div>
+                            <div style={{
+                              width: '100%',
+                              height: '8px',
+                              background: '#e2e8f0',
+                              borderRadius: '4px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: `${progressPercentage}%`,
+                                height: '100%',
+                                background: '#3b82f6',
+                                borderRadius: '4px'
+                              }}></div>
                             </div>
                           </div>
 

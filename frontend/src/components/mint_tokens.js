@@ -318,12 +318,8 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
                       <span className="transaction-value">€{selectedProject.token_price.toFixed(2)}</span>
                     </div>
                     <div className="transaction-row">
-                      <span className="transaction-label">Platform Fee (2%)</span>
-                      <span className="transaction-value">€{(tokensToReceive * selectedProject.token_price * 0.02).toFixed(2)}</span>
-                    </div>
-                    <div className="transaction-row">
-                      <span className="transaction-label">Gas Fee (Est.)</span>
-                      <span className="transaction-value">€3.50</span>
+                      <span className="transaction-label">Platform Fee (0,5%)</span>
+                      <span className="transaction-value">€{(tokensToReceive * selectedProject.token_price * 0.005).toFixed(2)}</span>
                     </div>
                     <div className="transaction-row total">
                       <span className="transaction-label">Total Cost</span>
