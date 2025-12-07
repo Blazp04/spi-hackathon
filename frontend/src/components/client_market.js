@@ -19,12 +19,10 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch projects from API
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        // If user is admin and wants to see pending, fetch all, otherwise just approved
         if (isAdmin && filters.pending) {
           const data = await projectsAPI.getAll();
           setProjects(data.projects || []);
@@ -34,7 +32,6 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
         }
       } catch (error) {
         console.error('Failed to fetch projects:', error);
-        // Fallback to demo data if API fails
         setProjects([
           {
             id: 1,
@@ -100,6 +97,8 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
             {isAuthenticated && (
               <a href="#submit" onClick={(e) => { e.preventDefault(); onSubmitProject && onSubmitProject(); }} className="nav-link">Submit Property</a>
             )}
+            <a href="#mint-tokens" onClick={(e) => { e.preventDefault(); onMintTokens && onMintTokens(); }} className="nav-link">Mint Tokens</a>
+            <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(); }} className="nav-link">Trading</a>
             <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
             {isAdmin && (
               <a href="#admin" onClick={(e) => { e.preventDefault(); onAdmin && onAdmin(); }} className="nav-link admin-link">Admin Dashboard</a>
