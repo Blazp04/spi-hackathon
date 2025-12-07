@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { projectsAPI } from '../services/api';
+import { projectsAPI, uploadAPI } from '../services/api';
 import './client_market.css';
 import './SubmitProject.css';
 
 const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTrading, onPortfolio, onAdmin }) => {
   const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -39,6 +40,28 @@ const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTradi
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadPromises = files.map(file => uploadAPI.uploadImage(file));
+      const results = await Promise.all(uploadPromises);
+      
+      const newImageUrls = results.map(result => `http://localhost:3001${result.url}`);
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newImageUrls]
+      }));
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload images. Please try again.');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -235,6 +258,40 @@ const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTradi
 
           <div className="form-section">
             <h3>Images</h3>
+            
+            <div className="form-group">
+              <label>Upload Images from Computer</label>
+              <div className="file-upload-area">
+                <input
+                  type="file"
+                  id="file-upload"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  disabled={uploadingImage}
+                />
+                <label htmlFor="file-upload" className="file-upload-label">
+                  {uploadingImage ? (
+                    <span>Uploading...</span>
+                  ) : (
+                    <>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Click to upload or drag and drop</span>
+                      <span className="file-hint">PNG, JPG, WebP or GIF (max 5MB each)</span>
+                    </>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            <div className="divider">
+              <span>OR</span>
+            </div>
             
             <div className="form-group">
               <label>Add Image URLs</label>

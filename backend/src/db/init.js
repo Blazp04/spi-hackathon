@@ -25,6 +25,7 @@ const initDB = async () => {
         images TEXT[], 
         price DECIMAL(15, 2),
         goal DECIMAL(15, 2),
+        current_funding DECIMAL(15, 2) DEFAULT 0,
         token_price DECIMAL(15, 2),
         min_investment DECIMAL(15, 2),
         status VARCHAR(20) DEFAULT 'pending',

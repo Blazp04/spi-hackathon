@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { projectsAPI } from '../services/api';
+import { projectsAPI, investmentsAPI } from '../services/api';
 import './mint_tokens.css';
 
 const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmin, onSubmitProject }) => {
@@ -10,50 +10,38 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(project?.id || null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Hardcoded projects data
   useEffect(() => {
-    const hardcodedProjects = [
-      {
-        id: 1,
-        name: 'Zagreb Tower A – Phase I',
-        location: 'Zagreb, Croatia',
-        status: 'Minting',
-        goal: 750000,
-        current_funding: 320000,
-        token_price: 125,
-        min_investment: 1000,
-        images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800']
-      },
-      {
-        id: 2,
-        name: 'Split Waterfront Residences',
-        location: 'Split, Croatia',
-        status: 'Minting',
-        goal: 1200000,
-        current_funding: 450000,
-        token_price: 150,
-        min_investment: 2000,
-        images: ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800']
-      },
-      {
-        id: 3,
-        name: 'Dubrovnik Heritage Plaza',
-        location: 'Dubrovnik, Croatia',
-        status: 'Minting',
-        goal: 950000,
-        current_funding: 380000,
-        token_price: 200,
-        min_investment: 1500,
-        images: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800']
+    const fetchProjects = async () => {
+      setLoading(true);
+      try {
+        const data = await projectsAPI.getAll();
+        const mintingProjects = (data.projects || [])
+          .filter(p => p.status === 'approved' || p.status === 'minting')
+          .map(p => ({
+            ...p,
+            goal: parseFloat(p.goal) || 0,
+            current_funding: parseFloat(p.current_funding) || 0,
+            token_price: parseFloat(p.token_price) || 0,
+            min_investment: parseFloat(p.min_investment) || 0,
+            price: parseFloat(p.price) || 0
+          }));
+        setProjects(mintingProjects);
+        
+        if (!selectedProjectId && mintingProjects.length > 0) {
+          setSelectedProjectId(mintingProjects[0].id);
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+        setError('Failed to load projects');
+      } finally {
+        setLoading(false);
       }
-    ];
-    
-    setProjects(hardcodedProjects);
-    if (!selectedProjectId) {
-      setSelectedProjectId(hardcodedProjects[0].id);
-    }
-    setLoading(false);
+    };
+    fetchProjects();
   }, []);
 
   const selectedProject = projects.find(p => p.id === selectedProjectId) || projects[0];
@@ -68,6 +56,53 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
     const value = e.target.value;
     setInvestmentAmount(value);
     setTokensToReceive(calculateTokens(value));
+  };
+
+  const handleInvestment = async () => {
+    if (!isAuthenticated) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
+    if (!selectedProject) {
+      setError('Please select a project');
+      return;
+    }
+
+    const numAmount = parseFloat(investmentAmount.replace(/[^0-9.-]+/g, ''));
+    
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setError('Please enter a valid investment amount');
+      return;
+    }
+
+    if (selectedProject.min_investment && numAmount < selectedProject.min_investment) {
+      setError(`Minimum investment is €${selectedProject.min_investment}`);
+      return;
+    }
+
+    setSubmitting(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const result = await investmentsAPI.create({
+        project_id: selectedProject.id,
+        amount: numAmount,
+        tx_hash: '0x' + Math.random().toString(16).substr(2, 64)
+      });
+
+      setSuccess(`Successfully invested €${numAmount.toLocaleString()}! You received ${tokensToReceive} tokens.`);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error('Investment error:', error);
+      setError(error.message || 'Failed to process investment');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -207,13 +242,35 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
               </div>
 
             <div className="right-column">
-              <div className="alert-warning">
-                <div className="alert-icon">⚠</div>
-                <div className="alert-content">
-                  <div className="alert-title">Minting period ends on March 15, 2024</div>
-                  <div className="alert-text">Limited time to participate in this investment opportunity</div>
+              {error && (
+                <div className="alert-warning" style={{backgroundColor: '#fee', borderColor: '#fcc'}}>
+                  <div className="alert-icon">❌</div>
+                  <div className="alert-content">
+                    <div className="alert-title">Error</div>
+                    <div className="alert-text">{error}</div>
+                  </div>
                 </div>
-              </div>
+              )}
+              
+              {success && (
+                <div className="alert-warning" style={{backgroundColor: '#efe', borderColor: '#cfc'}}>
+                  <div className="alert-icon">✅</div>
+                  <div className="alert-content">
+                    <div className="alert-title">Success</div>
+                    <div className="alert-text">{success}</div>
+                  </div>
+                </div>
+              )}
+
+              {!error && !success && (
+                <div className="alert-warning">
+                  <div className="alert-icon">⚠</div>
+                  <div className="alert-content">
+                    <div className="alert-title">Minting period ends on March 15, 2024</div>
+                    <div className="alert-text">Limited time to participate in this investment opportunity</div>
+                  </div>
+                </div>
+              )}
 
               <div className="mint-card">
                 <h2 className="mint-title">Mint Property Tokens</h2>
@@ -276,8 +333,14 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
                 </div>
 
                 <div className="action-buttons">
-                  <button className="btn-secondary" onClick={onBack}>Cancel</button>
-                  <button className="btn-primary">Confirm Investment</button>
+                  <button className="btn-secondary" onClick={onBack} disabled={submitting}>Cancel</button>
+                  <button 
+                    className="btn-primary" 
+                    onClick={handleInvestment}
+                    disabled={submitting || !isAuthenticated}
+                  >
+                    {submitting ? 'Processing...' : 'Confirm Investment'}
+                  </button>
                 </div>
               </div>
               </div>
