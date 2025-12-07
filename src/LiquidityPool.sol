@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./interfaces/ILiquidityPool.sol";
-import "./PropertyBuildToken.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+    SafeERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ILiquidityPool} from "./interfaces/ILiquidityPool.sol";
+import {PropertyBuildToken} from "./PropertyBuildToken.sol";
 
 /**
  * @title LiquidityPool
@@ -32,10 +36,10 @@ contract LiquidityPool is
     // ============ State Variables ============
 
     /// @notice PropertyBuild token contract
-    PropertyBuildToken public immutable token;
+    PropertyBuildToken public immutable TOKEN;
 
     /// @notice Stablecoin for trading
-    IERC20 public immutable stablecoin;
+    IERC20 public immutable STABLECOIN;
 
     /// @notice Treasury address for fee collection
     address public treasury;
@@ -125,8 +129,8 @@ contract LiquidityPool is
             revert InvalidAddress();
         }
 
-        token = PropertyBuildToken(_token);
-        stablecoin = IERC20(_stablecoin);
+        TOKEN = PropertyBuildToken(_token);
+        STABLECOIN = IERC20(_stablecoin);
         treasury = _treasury;
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -151,18 +155,18 @@ contract LiquidityPool is
         if (_pools[projectId].initialized) revert PoolAlreadyInitialized();
         if (initialTokens == 0 || initialStable == 0) revert InvalidAmount();
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
         if (tokenId == 0) revert InvalidAmount();
 
         // Transfer initial liquidity
-        token.safeTransferFrom(
+        TOKEN.safeTransferFrom(
             msg.sender,
             address(this),
             tokenId,
             initialTokens,
             ""
         );
-        stablecoin.safeTransferFrom(msg.sender, address(this), initialStable);
+        STABLECOIN.safeTransferFrom(msg.sender, address(this), initialStable);
 
         // Calculate initial LP tokens (geometric mean minus minimum liquidity)
         uint256 lpTokens = _sqrt(initialTokens * initialStable) -
@@ -214,7 +218,7 @@ contract LiquidityPool is
         if (!pool.initialized) revert PoolNotInitialized();
         if (tokenAmount == 0 || stableAmount == 0) revert InvalidAmount();
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
 
         // Calculate optimal amounts to maintain ratio
         uint256 optimalStable = (tokenAmount * pool.stableReserve) /
@@ -237,14 +241,14 @@ contract LiquidityPool is
         lpTokens = (actualToken * pool.totalLpTokens) / pool.tokenReserve;
 
         // Transfer tokens
-        token.safeTransferFrom(
+        TOKEN.safeTransferFrom(
             msg.sender,
             address(this),
             tokenId,
             actualToken,
             ""
         );
-        stablecoin.safeTransferFrom(msg.sender, address(this), actualStable);
+        STABLECOIN.safeTransferFrom(msg.sender, address(this), actualStable);
 
         // Update pool state
         pool.tokenReserve += actualToken;
@@ -278,7 +282,7 @@ contract LiquidityPool is
         if (_lpBalances[projectId][msg.sender] < lpTokenAmount)
             revert InsufficientLpTokens();
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
 
         // Calculate amounts to return
         tokens = (lpTokenAmount * pool.tokenReserve) / pool.totalLpTokens;
@@ -293,8 +297,8 @@ contract LiquidityPool is
         pool.stableReserve -= stable;
 
         // Transfer tokens
-        token.safeTransferFrom(address(this), msg.sender, tokenId, tokens, "");
-        stablecoin.safeTransfer(msg.sender, stable);
+        TOKEN.safeTransferFrom(address(this), msg.sender, tokenId, tokens, "");
+        STABLECOIN.safeTransfer(msg.sender, stable);
 
         emit LiquidityRemoved(projectId, msg.sender, tokens, stable);
     }
@@ -328,7 +332,7 @@ contract LiquidityPool is
         // Check circuit breaker
         _checkCircuitBreaker(projectId);
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
 
         // Calculate output with fee
         uint256 tokenAmountWithFee = tokenAmount *
@@ -346,14 +350,14 @@ contract LiquidityPool is
         pool.accumulatedFees += stableFee;
 
         // Transfer tokens
-        token.safeTransferFrom(
+        TOKEN.safeTransferFrom(
             msg.sender,
             address(this),
             tokenId,
             tokenAmount,
             ""
         );
-        stablecoin.safeTransfer(msg.sender, stableOut);
+        STABLECOIN.safeTransfer(msg.sender, stableOut);
 
         // Update reserves
         pool.tokenReserve += tokenAmount;
@@ -399,7 +403,7 @@ contract LiquidityPool is
         // Check circuit breaker
         _checkCircuitBreaker(projectId);
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
 
         // Calculate output with fee
         uint256 stableAmountWithFee = stableAmount *
@@ -416,8 +420,8 @@ contract LiquidityPool is
         pool.accumulatedFees += fee;
 
         // Transfer tokens
-        stablecoin.safeTransferFrom(msg.sender, address(this), stableAmount);
-        token.safeTransferFrom(
+        STABLECOIN.safeTransferFrom(msg.sender, address(this), stableAmount);
+        TOKEN.safeTransferFrom(
             address(this),
             msg.sender,
             tokenId,
@@ -500,7 +504,7 @@ contract LiquidityPool is
             BASIS_POINTS;
 
         if (treasuryShare > 0) {
-            stablecoin.safeTransfer(treasury, treasuryShare);
+            STABLECOIN.safeTransfer(treasury, treasuryShare);
         }
 
         emit FeesCollected(projectId, amount);
@@ -516,7 +520,7 @@ contract LiquidityPool is
         Pool storage pool = _pools[projectId];
         if (!pool.initialized) revert PoolNotInitialized();
 
-        uint256 tokenId = token.getProjectTokenId(projectId);
+        uint256 tokenId = TOKEN.getProjectTokenId(projectId);
         uint256 tokenBalance = pool.tokenReserve;
         uint256 stableBalance = pool.stableReserve;
 
@@ -525,7 +529,7 @@ contract LiquidityPool is
         pool.tradingActive = false;
 
         if (tokenBalance > 0) {
-            token.safeTransferFrom(
+            TOKEN.safeTransferFrom(
                 address(this),
                 treasury,
                 tokenId,
@@ -534,7 +538,7 @@ contract LiquidityPool is
             );
         }
         if (stableBalance > 0) {
-            stablecoin.safeTransfer(treasury, stableBalance);
+            STABLECOIN.safeTransfer(treasury, stableBalance);
         }
     }
 

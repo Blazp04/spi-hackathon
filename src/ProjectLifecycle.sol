@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./interfaces/IProjectLifecycle.sol";
-import "./interfaces/IEscrow.sol";
-import "./PropertyBuildToken.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+    SafeERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IProjectLifecycle} from "./interfaces/IProjectLifecycle.sol";
+import {IEscrow} from "./interfaces/IEscrow.sol";
+import {PropertyBuildToken} from "./PropertyBuildToken.sol";
 
 /**
  * @title ProjectLifecycle
@@ -36,13 +40,13 @@ contract ProjectLifecycle is
     // ============ State Variables ============
 
     /// @notice PropertyBuild token contract
-    PropertyBuildToken public immutable token;
+    PropertyBuildToken public immutable TOKEN;
 
     /// @notice Escrow contract for fund management
     IEscrow public escrow;
 
     /// @notice Payment token (stablecoin)
-    IERC20 public immutable paymentToken;
+    IERC20 public immutable PAYMENT_TOKEN;
 
     /// @notice Project counter for unique IDs
     uint256 private _projectIdCounter;
@@ -114,8 +118,8 @@ contract ProjectLifecycle is
             revert InvalidAddress();
         }
 
-        token = PropertyBuildToken(_token);
-        paymentToken = IERC20(_paymentToken);
+        TOKEN = PropertyBuildToken(_token);
+        PAYMENT_TOKEN = IERC20(_paymentToken);
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(PROJECT_ADMIN_ROLE, admin);
@@ -180,7 +184,7 @@ contract ProjectLifecycle is
         projectId = _projectIdCounter++;
 
         // Create token for this project
-        uint256 tokenId = token.createProjectToken(projectId, metadataUri);
+        uint256 tokenId = TOKEN.createProjectToken(projectId, metadataUri);
 
         _projects[projectId] = Project({
             projectId: projectId,
@@ -308,13 +312,13 @@ contract ProjectLifecycle is
         uint256 tokensToMint = (amount * 1e18) / project.tokenPrice;
 
         // Transfer payment token from investor to escrow
-        paymentToken.safeTransferFrom(msg.sender, address(escrow), amount);
+        PAYMENT_TOKEN.safeTransferFrom(msg.sender, address(escrow), amount);
 
         // Record deposit in escrow
         escrow.deposit(projectId, msg.sender, amount);
 
         // Mint tokens to investor
-        token.mint(msg.sender, project.tokenId, tokensToMint, "");
+        TOKEN.mint(msg.sender, project.tokenId, tokensToMint, "");
 
         // Update project state
         project.totalRaised += amount;
@@ -687,7 +691,7 @@ contract ProjectLifecycle is
 
         // Burn investor's tokens
         if (tokenBalance > 0) {
-            token.burn(msg.sender, project.tokenId, tokenBalance);
+            TOKEN.burn(msg.sender, project.tokenId, tokenBalance);
         }
 
         // Process refund through escrow

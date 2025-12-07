@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "forge-std/Test.sol";
-import "../src/PropertyBuildToken.sol";
-import "../src/ProjectLifecycle.sol";
-import "../src/Escrow.sol";
-import "../src/LiquidityPool.sol";
-import "../src/ProfitDistribution.sol";
-import "../script/DeployPropertyBuild.s.sol";
+import {Test} from "forge-std/Test.sol";
+import {PropertyBuildToken} from "../src/PropertyBuildToken.sol";
+import {ProjectLifecycle, IProjectLifecycle} from "../src/ProjectLifecycle.sol";
+import {Escrow} from "../src/Escrow.sol";
+import {LiquidityPool} from "../src/LiquidityPool.sol";
+import {ProfitDistribution} from "../src/ProfitDistribution.sol";
+import {MockUSDC} from "../script/DeployPropertyBuild.s.sol";
 
 /**
  * @title PropertyBuildTest

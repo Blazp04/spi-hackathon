@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "forge-std/Script.sol";
-import "../src/PropertyBuildToken.sol";
-import "../src/ProjectLifecycle.sol";
-import "../src/Escrow.sol";
-import "../src/LiquidityPool.sol";
-import "../src/ProfitDistribution.sol";
+import {Script, console} from "forge-std/Script.sol";
+import {PropertyBuildToken} from "../src/PropertyBuildToken.sol";
+import {ProjectLifecycle} from "../src/ProjectLifecycle.sol";
+import {Escrow} from "../src/Escrow.sol";
+import {LiquidityPool} from "../src/LiquidityPool.sol";
+import {ProfitDistribution} from "../src/ProfitDistribution.sol";
 
 /**
  * @title DeployPropertyBuild
@@ -205,9 +205,9 @@ contract DeployPropertyBuildLocal is Script {
  * @notice Simple mock USDC for testing
  */
 contract MockUSDC {
-    string public constant name = "Mock USDC";
-    string public constant symbol = "USDC";
-    uint8 public constant decimals = 6;
+    string public constant NAME = "Mock USDC";
+    string public constant SYMBOL = "USDC";
+    uint8 public constant DECIMALS = 6;
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;

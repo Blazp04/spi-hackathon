@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./interfaces/IEscrow.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+    SafeERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IEscrow} from "./interfaces/IEscrow.sol";
 
 /**
  * @title Escrow
@@ -26,7 +30,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
     // ============ State Variables ============
 
     /// @notice Payment token (stablecoin)
-    IERC20 public immutable paymentToken;
+    IERC20 public immutable PAYMENT_TOKEN;
 
     /// @notice Treasury wallet address
     address public treasury;
@@ -80,7 +84,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
             revert InvalidAddress();
         }
 
-        paymentToken = IERC20(_paymentToken);
+        PAYMENT_TOKEN = IERC20(_paymentToken);
         treasury = _treasury;
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -186,7 +190,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
         funds.totalPaidOut += amount;
         _milestonePayments[projectId][milestoneIndex] = amount;
 
-        paymentToken.safeTransfer(contractor, amount);
+        PAYMENT_TOKEN.safeTransfer(contractor, amount);
 
         emit MilestonePaymentReleased(
             projectId,
@@ -247,7 +251,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
         funds.totalPaidOut += amount;
         _investorDeposits[projectId][investor] = 0;
 
-        paymentToken.safeTransfer(investor, amount);
+        PAYMENT_TOKEN.safeTransfer(investor, amount);
 
         emit RefundProcessed(projectId, investor, amount);
     }
@@ -272,7 +276,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
         funds.platformFeeCollected += amount;
         funds.totalPaidOut += amount;
 
-        paymentToken.safeTransfer(treasury, amount);
+        PAYMENT_TOKEN.safeTransfer(treasury, amount);
 
         emit PlatformFeeCollected(projectId, amount);
     }
@@ -299,7 +303,7 @@ contract Escrow is AccessControl, ReentrancyGuard, Pausable, IEscrow {
 
         funds.totalPaidOut += amount;
 
-        paymentToken.safeTransfer(to, amount);
+        PAYMENT_TOKEN.safeTransfer(to, amount);
 
         emit EmergencyWithdrawal(projectId, to, amount);
     }

@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./interfaces/IProfitDistribution.sol";
-import "./interfaces/IProjectLifecycle.sol";
-import "./PropertyBuildToken.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+    SafeERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IProfitDistribution} from "./interfaces/IProfitDistribution.sol";
+import {IProjectLifecycle} from "./interfaces/IProjectLifecycle.sol";
+import {PropertyBuildToken} from "./PropertyBuildToken.sol";
 
 /**
  * @title ProfitDistribution
@@ -32,13 +36,13 @@ contract ProfitDistribution is
     // ============ State Variables ============
 
     /// @notice PropertyBuild token contract
-    PropertyBuildToken public immutable token;
+    PropertyBuildToken public immutable TOKEN;
 
     /// @notice Project lifecycle contract
-    IProjectLifecycle public immutable lifecycle;
+    IProjectLifecycle public immutable LIFECYCLE;
 
     /// @notice Payment token (stablecoin)
-    IERC20 public immutable paymentToken;
+    IERC20 public immutable PAYMENT_TOKEN;
 
     /// @notice Treasury address
     address public treasury;
@@ -107,9 +111,9 @@ contract ProfitDistribution is
             revert InvalidAddress();
         }
 
-        token = PropertyBuildToken(_token);
-        lifecycle = IProjectLifecycle(_lifecycle);
-        paymentToken = IERC20(_paymentToken);
+        TOKEN = PropertyBuildToken(_token);
+        LIFECYCLE = IProjectLifecycle(_lifecycle);
+        PAYMENT_TOKEN = IERC20(_paymentToken);
         treasury = _treasury;
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -150,7 +154,7 @@ contract ProfitDistribution is
         uint256 claimPeriodDays
     ) external override onlyRole(DISTRIBUTOR_ROLE) nonReentrant {
         // Validate project status
-        IProjectLifecycle.Project memory project = lifecycle.getProject(
+        IProjectLifecycle.Project memory project = LIFECYCLE.getProject(
             projectId
         );
         if (project.projectId == 0) revert InvalidProject();
@@ -175,7 +179,7 @@ contract ProfitDistribution is
             : 0;
 
         // Get total token supply at this block
-        uint256 totalSupply = token.totalSupply(project.tokenId);
+        uint256 totalSupply = TOKEN.totalSupply(project.tokenId);
         if (totalSupply == 0) revert InvalidAmount();
 
         // Take snapshot of all investor balances
@@ -208,7 +212,7 @@ contract ProfitDistribution is
         address[] memory investors = _projectInvestors[projectId];
         for (uint256 i = 0; i < investors.length; i++) {
             address investor = investors[i];
-            uint256 balance = token.balanceOf(investor, tokenId);
+            uint256 balance = TOKEN.balanceOf(investor, tokenId);
             _snapshotBalances[projectId][investor] = balance;
         }
     }
@@ -238,15 +242,15 @@ contract ProfitDistribution is
         dist.distributedAmount += amount;
 
         // Get project info for token burning
-        IProjectLifecycle.Project memory project = lifecycle.getProject(
+        IProjectLifecycle.Project memory project = LIFECYCLE.getProject(
             projectId
         );
 
         // Burn investor's tokens
-        token.burn(msg.sender, project.tokenId, investorBalance);
+        TOKEN.burn(msg.sender, project.tokenId, investorBalance);
 
         // Transfer profit
-        paymentToken.safeTransfer(msg.sender, amount);
+        PAYMENT_TOKEN.safeTransfer(msg.sender, amount);
 
         emit ProfitClaimed(projectId, msg.sender, amount, investorBalance);
     }
@@ -264,7 +268,7 @@ contract ProfitDistribution is
         if (!dist.isActive) revert DistributionNotActive();
         if (block.timestamp > dist.claimDeadline) revert ClaimPeriodExpired();
 
-        IProjectLifecycle.Project memory project = lifecycle.getProject(
+        IProjectLifecycle.Project memory project = LIFECYCLE.getProject(
             projectId
         );
 
@@ -284,10 +288,10 @@ contract ProfitDistribution is
             dist.distributedAmount += amount;
 
             // Burn investor's tokens
-            token.burn(investor, project.tokenId, investorBalance);
+            TOKEN.burn(investor, project.tokenId, investorBalance);
 
             // Transfer profit
-            paymentToken.safeTransfer(investor, amount);
+            PAYMENT_TOKEN.safeTransfer(investor, amount);
 
             emit ProfitClaimed(projectId, investor, amount, investorBalance);
         }
@@ -334,7 +338,7 @@ contract ProfitDistribution is
         // Mark all as distributed to prevent double recovery
         dist.distributedAmount = dist.totalProfit;
 
-        paymentToken.safeTransfer(treasury, amount);
+        PAYMENT_TOKEN.safeTransfer(treasury, amount);
 
         emit UncollectedFundsRecovered(projectId, amount);
     }
@@ -436,15 +440,14 @@ contract ProfitDistribution is
 
     /**
      * @notice Deposits funds for distribution
-     * @param projectId Project ID
      * @param amount Amount to deposit
      */
     function depositFunds(
-        uint256 projectId,
+        uint256 /* projectId */,
         uint256 amount
     ) external onlyRole(DISTRIBUTOR_ROLE) {
         if (amount == 0) revert InvalidAmount();
-        paymentToken.safeTransferFrom(msg.sender, address(this), amount);
+        PAYMENT_TOKEN.safeTransferFrom(msg.sender, address(this), amount);
     }
 
     // ============ Pausability ============

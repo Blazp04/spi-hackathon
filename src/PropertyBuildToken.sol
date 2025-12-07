@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "./interfaces/IPropertyBuildToken.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {
+    ERC1155Burnable
+} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+import {
+    ERC1155Pausable
+} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
+import {
+    ERC1155Supply
+} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {IPropertyBuildToken} from "./interfaces/IPropertyBuildToken.sol";
 
 /**
  * @title PropertyBuildToken
@@ -51,7 +59,7 @@ contract PropertyBuildToken is
     mapping(uint256 => uint256) private _tokenProjectIds;
 
     /// @notice Token URI storage per token ID
-    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => string) private _tokenUris;
 
     /// @notice Counter for generating unique token IDs
     uint256 private _tokenIdCounter;
@@ -138,7 +146,7 @@ contract PropertyBuildToken is
 
         _projectTokenIds[projectId] = tokenId;
         _tokenProjectIds[tokenId] = projectId;
-        _tokenURIs[tokenId] = tokenUri;
+        _tokenUris[tokenId] = tokenUri;
 
         // Set default rate limits
         _rateLimits[tokenId] = RateLimitConfig({
@@ -268,7 +276,7 @@ contract PropertyBuildToken is
     function uri(uint256 tokenId) public view override returns (string memory) {
         if (!_tokenExists(tokenId)) revert TokenDoesNotExist(tokenId);
 
-        string memory tokenUri = _tokenURIs[tokenId];
+        string memory tokenUri = _tokenUris[tokenId];
         if (bytes(tokenUri).length > 0) {
             return tokenUri;
         }
@@ -287,7 +295,7 @@ contract PropertyBuildToken is
     ) external override onlyRole(PROJECT_ADMIN_ROLE) {
         if (!_tokenExists(tokenId)) revert TokenDoesNotExist(tokenId);
 
-        _tokenURIs[tokenId] = newUri;
+        _tokenUris[tokenId] = newUri;
 
         emit URIUpdated(tokenId, newUri);
         emit URI(newUri, tokenId);
