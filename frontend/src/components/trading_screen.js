@@ -251,24 +251,7 @@ const TradingScreen = ({ project, onMarketplace, onPortfolio, onMintTokens, onAd
                   </div>
                 </div>
 
-                <div className="trade-details">
-                  <div className="detail-row">
-                    <span className="detail-label">Rate</span>
-                    <span className="detail-value">1 ZTA1 = €24.50</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Price Impact</span>
-                    <span className="detail-value success">0.15%</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Slippage Tolerance</span>
-                    <span className="detail-value">0.5%</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Network Fee</span>
-                    <span className="detail-value">~€2.40</span>
-                  </div>
-                </div>
+               
 
                 <button className="swap-button">Swap</button>
               </div>
@@ -295,78 +278,6 @@ const TradingScreen = ({ project, onMarketplace, onPortfolio, onMintTokens, onAd
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="market-info-panel">
-              <div className="info-card">
-                <h3 className="card-title">Liquidity Pool</h3>
-                <div className="liquidity-stats">
-                  <div className="stat-row">
-                    <span className="stat-label">Total Liquidity</span>
-                    <span className="stat-value">€360,000</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">USDT Reserve</span>
-                    <span className="stat-value">180,000 USDT</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">ZTA1 Reserve</span>
-                    <span className="stat-value">7,347 ZTA1</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">24h Volume</span>
-                    <span className="stat-value success">€42,580</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="info-card">
-                <h3 className="card-title">Market Statistics</h3>
-                <div className="market-stats">
-                  <div className="stat-row">
-                    <span className="stat-label">Market Cap</span>
-                    <span className="stat-value">€1.85M</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Circulating Supply</span>
-                    <span className="stat-value">75,510 ZTA1</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Total Supply</span>
-                    <span className="stat-value">100,000 ZTA1</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">APY</span>
-                    <span className="stat-value success">8.4%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="info-card">
-                <h3 className="card-title">Price History (7D)</h3>
-                <div className="chart-placeholder">
-                  <svg width="100%" height="150" viewBox="0 0 300 150">
-                    <polyline
-                      fill="none"
-                      stroke="#10b981"
-                      strokeWidth="2"
-                      points="0,100 50,80 100,90 150,60 200,70 250,40 300,50"
-                    />
-                    <polyline
-                      fill="url(#gradient)"
-                      stroke="none"
-                      points="0,100 50,80 100,90 150,60 200,70 250,40 300,50 300,150 0,150"
-                    />
-                    <defs>
-                      <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.3"/>
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0"/>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="chart-loading">Chart Loading...</div>
                 </div>
               </div>
             </div>
