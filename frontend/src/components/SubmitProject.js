@@ -125,19 +125,6 @@ const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTradi
       </header>
 
       <div className="submit-content">
-        <div className="container">
-          <div className="page-header">
-            <h1>Submit New Property</h1>
-          </div>
-          <div className="user-info">
-            <span className="wallet-address">
-              {user?.wallet?.slice(0, 6)}...{user?.wallet?.slice(-4)}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <div className="submit-content">
         <form className="submit-form" onSubmit={handleSubmit}>
           <div className="form-section">
             <h3>Property Details</h3>

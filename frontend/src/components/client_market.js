@@ -307,48 +307,51 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onA
                 ) : filteredProjects.length === 0 ? (
                   <div className="empty-message">No projects found. {!isAuthenticated && 'Connect wallet to submit a property.'}</div>
                 ) : (
-                  filteredProjects.map(project => (
-                    <div key={project.id} className="project-card">
-                      <div className="project-image">
-                        <img src={getProjectImage(project)} alt={project.name} />
-                        <span className={`status-badge ${project.status}`}>
-                          {project.status}
-                        </span>
-                      </div>
-                      <div className="project-content">
-                        <h3 className="project-title">{project.name}</h3>
-                        <p className="project-location">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                          </svg>
-                          {project.location || 'Location TBD'}
-                        </p>
-                        
-                        <div className="project-details">
-                          <div className="detail-item">
-                            <span className="detail-label">Token Price</span>
-                            <span className="detail-value">{formatPrice(project.token_price)}</span>
-                          </div>
-                          <div className="detail-item">
-                            <span className="detail-label">Goal</span>
-                            <span className="detail-value">{formatPrice(project.goal)}</span>
-                          </div>
-                          <div className="detail-item">
-                            <span className="detail-label">Min. Investment</span>
-                            <span className="detail-value">{formatPrice(project.min_investment)}</span>
-                          </div>
+                  filteredProjects.map(project => {
+                    console.table(project);
+                    return (
+                      <div key={project.id} className="project-card1">
+                        <div className="project-image">
+                          <img src={getProjectImage(project)} alt={project.name} />
+                          <span className={`status-badge ${project.status}`}>
+                            {project.status}
+                          </span>
                         </div>
+                        <div className="project-content">
+                          <h3 className="project-title">{project.name}</h3>
+                          <p className="project-location">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                              <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            {project.location || 'Location TBD'}
+                          </p>
+                          
+                          <div className="project-details">
+                            <div className="detail-item">
+                              <span className="detail-label">Token Price</span>
+                              <span className="detail-value">{formatPrice(project.token_price)}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span className="detail-label">Goal</span>
+                              <span className="detail-value">{formatPrice(project.goal)}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span className="detail-label">Min. Investment</span>
+                              <span className="detail-value">{formatPrice(project.min_investment)}</span>
+                            </div>
+                          </div>
 
-                        <button 
-                          className="action-btn invest"
-                          onClick={() => onViewDetails && onViewDetails(project)}
-                        >
-                          View Details
-                        </button>
+                          <button 
+                            className="action-btn invest"
+                            onClick={() => onViewDetails && onViewDetails(project)}
+                          >
+                            View Details
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </main>
