@@ -11,49 +11,50 @@ const MintTokens = ({ project, onBack, onMarket2, onPortfolio, onTrading, onAdmi
   const [selectedProjectId, setSelectedProjectId] = useState(project?.id || null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch projects
+  // Hardcoded projects data
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        const data = await projectsAPI.getApproved();
-        const projectsList = data.projects || [];
-        setProjects(projectsList);
-        if (projectsList.length > 0 && !selectedProjectId) {
-          setSelectedProjectId(projectsList[0].id);
-        }
-      } catch (error) {
-        console.error('Failed to fetch projects:', error);
-        const fallbackProjects = [
-          {
-            id: 1,
-            name: 'Zagreb Tower A – Phase I',
-            location: 'Zagreb, Croatia',
-            status: 'Minting',
-            goal: 750000,
-            current_funding: 320000,
-            token_price: 1,
-            images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800']
-          },
-          {
-            id: 2,
-            name: 'Dubrovnik Seaside Villas',
-            location: 'Dubrovnik, Croatia',
-            status: 'Minting',
-            goal: 1200000,
-            current_funding: 450000,
-            token_price: 1.5,
-            images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800']
-          }
-        ];
-        setProjects(fallbackProjects);
-        if (!selectedProjectId) setSelectedProjectId(fallbackProjects[0].id);
-      } finally {
-        setLoading(false);
+    const hardcodedProjects = [
+      {
+        id: 1,
+        name: 'Zagreb Tower A – Phase I',
+        location: 'Zagreb, Croatia',
+        status: 'Minting',
+        goal: 750000,
+        current_funding: 320000,
+        token_price: 125,
+        min_investment: 1000,
+        images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800']
+      },
+      {
+        id: 2,
+        name: 'Split Waterfront Residences',
+        location: 'Split, Croatia',
+        status: 'Minting',
+        goal: 1200000,
+        current_funding: 450000,
+        token_price: 150,
+        min_investment: 2000,
+        images: ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800']
+      },
+      {
+        id: 3,
+        name: 'Dubrovnik Heritage Plaza',
+        location: 'Dubrovnik, Croatia',
+        status: 'Minting',
+        goal: 950000,
+        current_funding: 380000,
+        token_price: 200,
+        min_investment: 1500,
+        images: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800']
       }
-    };
-    fetchProjects();
-  }, [selectedProjectId]);
+    ];
+    
+    setProjects(hardcodedProjects);
+    if (!selectedProjectId) {
+      setSelectedProjectId(hardcodedProjects[0].id);
+    }
+    setLoading(false);
+  }, []);
 
   const selectedProject = projects.find(p => p.id === selectedProjectId) || projects[0];
 
