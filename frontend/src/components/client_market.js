@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { projectsAPI } from '../services/api';
 import './client_market.css';
 
-const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onMarket2 }) => {
+const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onAdmin, onSubmitProject }) => {
+  const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
+  
   const [filters, setFilters] = useState({
-    minting: true,
-    building: true,
-    trading: false,
+    approved: true,
+    pending: false,
     location: 'All Cities',
     propertyType: 'all',
     minInvestment: '',
@@ -13,64 +16,71 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onM
   });
 
   const [sortBy, setSortBy] = useState('newest');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const projects = [
-    {
-      id: 1,
-      name: 'Zagreb Tower A – Phase I',
-      location: 'Zagreb, Croatia',
-      status: 'Minting',
-      progress: 42.7,
-      raised: '€320,000',
-      goal: '€750,000',
-      tokenPrice: '€125',
-      minInvestment: '€1,000',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400'
-    },
-    {
-      id: 2,
-      name: 'Split Business Center',
-      location: 'Split, Croatia',
-      status: 'Building',
-      progress: 78.3,
-      raised: '€840,000',
-      goal: '€1,200,000',
-      tokenPrice: '€200',
-      minInvestment: '€2,000',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400'
-    },
-    {
-      id: 3,
-      name: 'Dubrovnik Sea View Residences',
-      location: 'Dubrovnik, Croatia',
-      status: 'Trading',
-      progress: 100,
-      raised: '€2,500,000',
-      goal: '€2,500,000',
-      currentPrice: '€520',
-      volume24h: '€45,200',
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400'
-    },
-    {
-      id: 4,
-      name: 'Rijeka Marina Complex',
-      location: 'Rijeka, Croatia',
-      status: 'Minting',
-      progress: 35.2,
-      raised: '€176,000',
-      goal: '€500,000',
-      tokenPrice: '€150',
-      minInvestment: '€1,500',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400'
-    }
-  ];
+  // Fetch projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      try {
+        // If user is admin and wants to see pending, fetch all, otherwise just approved
+        if (isAdmin && filters.pending) {
+          const data = await projectsAPI.getAll();
+          setProjects(data.projects || []);
+        } else {
+          const data = await projectsAPI.getApproved();
+          setProjects(data.projects || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+        // Fallback to demo data if API fails
+        setProjects([
+          {
+            id: 1,
+            name: 'Zagreb Tower A – Phase I',
+            location: 'Zagreb, Croatia',
+            status: 'approved',
+            goal: 750000,
+            token_price: 125,
+            min_investment: 1000,
+            images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400']
+          },
+          {
+            id: 2,
+            name: 'Split Business Center',
+            location: 'Split, Croatia',
+            status: 'approved',
+            goal: 1200000,
+            token_price: 200,
+            min_investment: 2000,
+            images: ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400']
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, [isAdmin, filters.pending]);
 
   const filteredProjects = projects.filter(project => {
-    if (filters.minting && project.status === 'Minting') return true;
-    if (filters.building && project.status === 'Building') return true;
-    if (filters.trading && project.status === 'Trading') return true;
+    if (filters.approved && project.status === 'approved') return true;
+    if (filters.pending && project.status === 'pending' && isAdmin) return true;
     return false;
   });
+
+  const formatPrice = (price) => {
+    if (!price) return 'N/A';
+    return `€${Number(price).toLocaleString()}`;
+  };
+
+  const getProjectImage = (project) => {
+    if (project.images && project.images.length > 0) {
+      return project.images[0];
+    }
+    return 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400';
+  };
 
   return (
     <div className="marketplace">
@@ -87,19 +97,39 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onM
           </div>
           <nav className="nav">
             <a href="#marketplace" className="nav-link active">Marketplace</a>
-            <a href="#projects" onClick={(e) => { e.preventDefault(); onMarket2 && onMarket2(); }} className="nav-link">Projects</a>
+            {isAuthenticated && (
+              <a href="#submit" onClick={(e) => { e.preventDefault(); onSubmitProject && onSubmitProject(); }} className="nav-link">Submit Property</a>
+            )}
             <a href="#portfolio" onClick={(e) => { e.preventDefault(); onPortfolio && onPortfolio(); }} className="nav-link">Portfolio</a>
-            <a href="#mint-tokens" onClick={(e) => { e.preventDefault(); onMintTokens && onMintTokens(null); }} className="nav-link">Mint Tokens</a>
-            <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(null); }} className="nav-link">Trading</a>
+            {isAdmin && (
+              <a href="#admin" onClick={(e) => { e.preventDefault(); onAdmin && onAdmin(); }} className="nav-link admin-link">Admin Dashboard</a>
+            )}
           </nav>
           <div className="header-actions">
-            <button className="connect-wallet-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
-              Connect Wallet
-            </button>
+            {authError && <span className="auth-error">{authError}</span>}
+            {isAuthenticated ? (
+              <div className="user-menu">
+                {isAdmin && <span className="admin-badge">ADMIN</span>}
+                <span className="wallet-display">
+                  {user?.wallet?.slice(0, 6)}...{user?.wallet?.slice(-4)}
+                </span>
+                <button className="disconnect-btn" onClick={disconnect}>
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button 
+                className="connect-wallet-btn" 
+                onClick={connectWallet}
+                disabled={authLoading || !hasMetaMask}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                {authLoading ? 'Connecting...' : hasMetaMask ? 'Connect Wallet' : 'Install MetaMask'}
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -125,30 +155,23 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onM
                   <label className="checkbox-label">
                     <input
                       type="checkbox"
-                      checked={filters.minting}
-                      onChange={(e) => setFilters({...filters, minting: e.target.checked})}
+                      checked={filters.approved}
+                      onChange={(e) => setFilters({...filters, approved: e.target.checked})}
                     />
-                    <span>Minting</span>
-                    <span className="filter-count filter-count-blue">4</span>
+                    <span>Approved</span>
+                    <span className="filter-count filter-count-green">{projects.filter(p => p.status === 'approved').length}</span>
                   </label>
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={filters.building}
-                      onChange={(e) => setFilters({...filters, building: e.target.checked})}
-                    />
-                    <span>Building</span>
-                    <span className="filter-count filter-count-orange">3</span>
-                  </label>
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={filters.trading}
-                      onChange={(e) => setFilters({...filters, trading: e.target.checked})}
-                    />
-                    <span>Trading</span>
-                    <span className="filter-count filter-count-green">5</span>
-                  </label>
+                  {isAdmin && (
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={filters.pending}
+                        onChange={(e) => setFilters({...filters, pending: e.target.checked})}
+                      />
+                      <span>Pending</span>
+                      <span className="filter-count filter-count-orange">{projects.filter(p => p.status === 'pending').length}</span>
+                    </label>
+                  )}
                 </div>
 
                 <div className="filter-group">
@@ -244,78 +267,54 @@ const ClientMarket = ({ onViewDetails, onMintTokens, onTrading, onPortfolio, onM
               </div>
 
               <div className="projects-grid">
-                {filteredProjects.map(project => (
-                  <div key={project.id} className="project-card">
-                    <div className="project-image">
-                      <img src={project.image} alt={project.name} />
-                      <span className={`status-badge ${project.status.toLowerCase()}`}>
-                        {project.status}
-                      </span>
-                    </div>
-                    <div className="project-content">
-                      <h3 className="project-title">{project.name}</h3>
-                      <p className="project-location">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                          <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        {project.location}
-                      </p>
-                      
-                      <div className="progress-section">
-                        <div className="progress-header">
-                          <span>Progress</span>
-                          <span className="progress-percent">{project.progress}%</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill" 
-                            style={{width: `${project.progress}%`}}
-                          ></div>
-                        </div>
-                        {project.status !== 'Trading' && (
-                          <div className="progress-amounts">
-                            <span>{project.raised} raised</span>
-                            <span>{project.goal} goal</span>
+                {loading ? (
+                  <div className="loading-message">Loading projects...</div>
+                ) : filteredProjects.length === 0 ? (
+                  <div className="empty-message">No projects found. {!isAuthenticated && 'Connect wallet to submit a property.'}</div>
+                ) : (
+                  filteredProjects.map(project => (
+                    <div key={project.id} className="project-card">
+                      <div className="project-image">
+                        <img src={getProjectImage(project)} alt={project.name} />
+                        <span className={`status-badge ${project.status}`}>
+                          {project.status}
+                        </span>
+                      </div>
+                      <div className="project-content">
+                        <h3 className="project-title">{project.name}</h3>
+                        <p className="project-location">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
+                          {project.location || 'Location TBD'}
+                        </p>
+                        
+                        <div className="project-details">
+                          <div className="detail-item">
+                            <span className="detail-label">Token Price</span>
+                            <span className="detail-value">{formatPrice(project.token_price)}</span>
                           </div>
-                        )}
-                      </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Goal</span>
+                            <span className="detail-value">{formatPrice(project.goal)}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Min. Investment</span>
+                            <span className="detail-value">{formatPrice(project.min_investment)}</span>
+                          </div>
+                        </div>
 
-                      <div className="project-details">
-                        {project.status === 'Trading' ? (
-                          <>
-                            <div className="detail-item">
-                              <span className="detail-label">Current Price</span>
-                              <span className="detail-value">{project.currentPrice}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">24h Volume</span>
-                              <span className="detail-value success">{project.volume24h}</span>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="detail-item">
-                              <span className="detail-label">Token Price</span>
-                              <span className="detail-value">{project.tokenPrice}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">Min. Investment</span>
-                              <span className="detail-value">{project.minInvestment}</span>
-                            </div>
-                          </>
-                        )}
+                        <button 
+                          className="action-btn invest"
+                          onClick={() => onViewDetails && onViewDetails(project)}
+                        >
+                          View Details
+                        </button>
                       </div>
-
-                      <button 
-                        className={`action-btn ${project.status === 'Trading' ? 'trade' : 'invest'}`}
-                        onClick={() => onViewDetails && onViewDetails(project)}
-                      >
-                        {project.status === 'Trading' ? 'Trade Now' : 'View Details'}
-                      </button>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </main>
           </div>
