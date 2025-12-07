@@ -125,8 +125,14 @@ const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTradi
       </header>
 
       <div className="submit-content">
-        <form className="submit-form" onSubmit={handleSubmit}>
-          <div className="form-section">
+        <div className="container">
+          <div className="page-header">
+            <h1>Submit New Property</h1>
+          </div>
+          
+          <div className="submit-layout">
+            <form className="submit-form" onSubmit={handleSubmit}>
+            <div className="form-section">
             <h3>Property Details</h3>
             
             <div className="form-group">
@@ -271,17 +277,19 @@ const SubmitProject = ({ onBack, onSuccess, onMarketplace, onMintTokens, onTradi
               {loading ? 'Submitting...' : 'Submit for Approval'}
             </button>
           </div>
-        </form>
+            </form>
 
-        <div className="info-panel">
-          <h4>📋 Submission Guidelines</h4>
-          <ul>
-            <li>All submissions are reviewed by our admin team</li>
-            <li>Approval typically takes 24-48 hours</li>
-            <li>Provide accurate financial details</li>
-            <li>High-quality images increase approval chances</li>
-            <li>You will be notified once reviewed</li>
-          </ul>
+            <div className="info-panel">
+              <h4>📋 Submission Guidelines</h4>
+              <ul>
+                <li>All submissions are reviewed by our admin team</li>
+                <li>Approval typically takes 24-48 hours</li>
+                <li>Provide accurate financial details</li>
+                <li>High-quality images increase approval chances</li>
+                <li>You will be notified once reviewed</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>

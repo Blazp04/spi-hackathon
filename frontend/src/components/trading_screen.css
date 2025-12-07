@@ -8,6 +8,107 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
+.project-selector-section {
+  background-color: white;
+  padding: 32px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.selector-header {
+  margin-bottom: 24px;
+}
+
+.selector-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin: 0 0 8px 0;
+}
+
+.selector-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.project-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.selector-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.selector-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.selector-card.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(to bottom right, #eff6ff, #dbeafe);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.selector-card-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.selector-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.selector-info {
+  flex: 1;
+}
+
+.selector-info h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3a5f;
+  margin: 0 0 4px 0;
+}
+
+.selector-info p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 8px 0;
+}
+
+.selector-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.selected-checkmark {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .trading-header {
   background-color: white;
   border-bottom: 1px solid #e5e7eb;

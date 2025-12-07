@@ -1,8 +1,55 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import './client_market.css';
 import './portofolio.css';
 
-const Portfolio = ({ onBack, onMintTokens, onTrading }) => {
-  const [timeRange, setTimeRange] = useState('1Y');
+const Portfolio = ({ onMarketplace, onMintTokens, onTrading, onAdmin, onSubmitProject }) => {
+  const { user, isAuthenticated, isAdmin, loading: authLoading, connectWallet, disconnect, hasMetaMask, error: authError } = useAuth();
+
+  // Mock data za korisnička ulaganja (u budućnosti dohvatiti iz API-ja)
+  const userInvestments = [
+    {
+      id: 1,
+      projectName: 'Zagreb Tower A – Phase I',
+      location: 'Zagreb, Croatia',
+      tokensOwned: 40,
+      tokenPrice: 125,
+      totalValue: 5000,
+      initialInvestment: 4500,
+      profitLoss: 500,
+      profitLossPercent: 11.11,
+      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400'
+    },
+    {
+      id: 2,
+      projectName: 'Split Waterfront Residences',
+      location: 'Split, Croatia',
+      tokensOwned: 25,
+      tokenPrice: 150,
+      totalValue: 3750,
+      initialInvestment: 3500,
+      profitLoss: 250,
+      profitLossPercent: 7.14,
+      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400'
+    },
+    {
+      id: 3,
+      projectName: 'Dubrovnik Heritage Plaza',
+      location: 'Dubrovnik, Croatia',
+      tokensOwned: 15,
+      tokenPrice: 200,
+      totalValue: 3000,
+      initialInvestment: 3200,
+      profitLoss: -200,
+      profitLossPercent: -6.25,
+      image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400'
+    }
+  ];
+
+  const totalPortfolioValue = userInvestments.reduce((sum, inv) => sum + inv.totalValue, 0);
+  const totalInvestment = userInvestments.reduce((sum, inv) => sum + inv.initialInvestment, 0);
+  const totalProfitLoss = totalPortfolioValue - totalInvestment;
+  const totalProfitLossPercent = ((totalProfitLoss / totalInvestment) * 100).toFixed(2);
 
   const portfolioStats = [
     {
@@ -39,46 +86,56 @@ const Portfolio = ({ onBack, onMintTokens, onTrading }) => {
     }
   ];
 
-  const chartData = [
-    { month: 'Jan', value: 2.1 },
-    { month: 'Feb', value: 2.15 },
-    { month: 'Mar', value: 2.25 },
-    { month: 'Apr', value: 2.4 },
-    { month: 'May', value: 2.45 },
-    { month: 'Jun', value: 2.5 },
-    { month: 'Jul', value: 2.55 },
-    { month: 'Aug', value: 2.6 },
-    { month: 'Sep', value: 2.7 },
-    { month: 'Oct', value: 2.75 },
-    { month: 'Nov', value: 2.8 },
-    { month: 'Dec', value: 2.85 }
-  ];
-
-  const maxValue = Math.max(...chartData.map(d => d.value));
-  const minValue = Math.min(...chartData.map(d => d.value));
-
   return (
     <div className="portfolio-container">
-      <header className="portfolio-header">
+      <header className="header">
         <div className="header-content">
-          <div className="logo-section">
-            <div className="logo-icon">R</div>
-            <span className="logo-text">RealtyChain</span>
+          <div className="logo">
+            <div className="logo-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 22V12H15V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="logo-text">BlockByBlock</span>
           </div>
-          <nav className="nav-links">
-            <button onClick={onBack} className="nav-link">Marketplace</button>
-            <button onClick={onMintTokens} className="nav-link">Mint Tokens</button>
-            <button className="nav-link active">Portfolio</button>
-            <button onClick={onTrading} className="nav-link">Trading</button>
+          <nav className="nav">
+            <a href="#marketplace" onClick={(e) => { e.preventDefault(); onMarketplace && onMarketplace(); }} className="nav-link">Marketplace</a>
+            {isAuthenticated && (
+              <a href="#submit" onClick={(e) => { e.preventDefault(); onSubmitProject && onSubmitProject(); }} className="nav-link">Submit Property</a>
+            )}
+            <a href="#mint-tokens" onClick={(e) => { e.preventDefault(); onMintTokens && onMintTokens(); }} className="nav-link">Mint Tokens</a>
+            <a href="#trading" onClick={(e) => { e.preventDefault(); onTrading && onTrading(); }} className="nav-link">Trading</a>
+            <a href="#portfolio" className="nav-link active">Portfolio</a>
+            {isAdmin && (
+              <a href="#admin" onClick={(e) => { e.preventDefault(); onAdmin && onAdmin(); }} className="nav-link admin-link">Admin Dashboard</a>
+            )}
           </nav>
           <div className="header-actions">
-            <button className="connect-btn">
-              <span className="status-dot"></span>
-              Connected
-            </button>
-            <div className="user-avatar">
-              <img src="https://ui-avatars.com/api/?name=User&size=32&background=3b82f6&color=fff" alt="User" />
-            </div>
+            {authError && <span className="auth-error">{authError}</span>}
+            {isAuthenticated ? (
+              <div className="user-menu">
+                {isAdmin && <span className="admin-badge">ADMIN</span>}
+                <span className="wallet-display">
+                  {user?.wallet?.slice(0, 6)}...{user?.wallet?.slice(-4)}
+                </span>
+                <button className="disconnect-btn" onClick={disconnect}>
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button 
+                className="connect-wallet-btn" 
+                onClick={connectWallet}
+                disabled={authLoading || !hasMetaMask}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                {authLoading ? 'Connecting...' : hasMetaMask ? 'Connect Wallet' : 'Install MetaMask'}
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -90,21 +147,7 @@ const Portfolio = ({ onBack, onMintTokens, onTrading }) => {
             <p className="portfolio-subtitle">Track your real estate investments and performance</p>
           </div>
           <div className="title-actions">
-            <button className="export-btn">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M4.66666 6.66667L7.99999 10L11.3333 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Export Report
-            </button>
-            <button className="new-investment-btn">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 3.33334V12.6667" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3.33334 8H12.6667" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              New Investment
-            </button>
+
           </div>
         </div>
 
@@ -129,93 +172,81 @@ const Portfolio = ({ onBack, onMintTokens, onTrading }) => {
           ))}
         </div>
 
-        <div className="performance-section">
-          <div className="performance-header">
-            <h2 className="performance-title">Portfolio Performance</h2>
-            <div className="time-range-buttons">
-              {['1W', '6M', '3M', '1M'].map((range) => (
-                <button
-                  key={range}
-                  className={`time-range-btn ${timeRange === range ? 'active' : ''}`}
-                  onClick={() => setTimeRange(range)}
-                >
-                  {range}
-                </button>
-              ))}
+        <div className="holdings-section">
+          <div className="holdings-header">
+            <h2 className="holdings-title">My Property Holdings</h2>
+            <p className="holdings-subtitle">
+              Total: {userInvestments.length} properties • Value: €{totalPortfolioValue.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="holdings-grid">
+            {userInvestments.map((investment) => (
+              <div key={investment.id} className="holding-card">
+                <div className="holding-image">
+                  <img src={investment.image} alt={investment.projectName} />
+                  <div className="holding-tokens-badge">
+                    {investment.tokensOwned} tokens
+                  </div>
+                </div>
+                <div className="holding-content">
+                  <h3 className="holding-name">{investment.projectName}</h3>
+                  <p className="holding-location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {investment.location}
+                  </p>
+
+                  <div className="holding-stats">
+                    <div className="holding-stat">
+                      <span className="stat-label">Tokens Owned</span>
+                      <span className="stat-value">{investment.tokensOwned}</span>
+                    </div>
+                    <div className="holding-stat">
+                      <span className="stat-label">Token Price</span>
+                      <span className="stat-value">€{investment.tokenPrice}</span>
+                    </div>
+                    <div className="holding-stat">
+                      <span className="stat-label">Current Value</span>
+                      <span className="stat-value">€{investment.totalValue.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="holding-performance">
+                    <div className="performance-bar">
+                      <div className="performance-label">
+                        <span>Investment</span>
+                        <span>€{investment.initialInvestment.toLocaleString()}</span>
+                      </div>
+                      <div className="performance-indicator">
+                        <span className={`performance-change ${investment.profitLoss >= 0 ? 'positive' : 'negative'}`}>
+                          {investment.profitLoss >= 0 ? '+' : ''}€{investment.profitLoss.toLocaleString()} 
+                          ({investment.profitLoss >= 0 ? '+' : ''}{investment.profitLossPercent}%)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button className="holding-action-btn" onClick={() => onTrading && onTrading()}>
+                    Trade Tokens
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {userInvestments.length === 0 && (
+            <div className="empty-holdings">
+              <div className="empty-icon">📊</div>
+              <h3>No Holdings Yet</h3>
+              <p>Start investing in tokenized properties to see your portfolio here</p>
+              <button className="browse-btn" onClick={() => onMarketplace && onMarketplace()}>
+                Browse Properties
+              </button>
             </div>
-          </div>
-
-          <div className="chart-container">
-            <svg width="100%" height="300" className="chart-svg">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <line
-                  key={i}
-                  x1="0"
-                  y1={60 + i * 60}
-                  x2="100%"
-                  y2={60 + i * 60}
-                  stroke="#E5E7EB"
-                  strokeWidth="1"
-                />
-              ))}
-
-              {[2.5, 2, 1.5, 1, 0.5].map((value, i) => (
-                <text
-                  key={i}
-                  x="10"
-                  y={60 + i * 60}
-                  fill="#6B7280"
-                  fontSize="12"
-                  alignmentBaseline="middle"
-                >
-                  {value}M
-                </text>
-              ))}
-
-              <polyline
-                fill="none"
-                stroke="#3B82F6"
-                strokeWidth="2"
-                points={chartData.map((d, i) => {
-                  const x = 80 + (i * (100 / (chartData.length - 1)) * 0.85) + '%';
-                  const y = 300 - ((d.value - minValue) / (maxValue - minValue)) * 240;
-                  return `${x},${y}`;
-                }).join(' ')}
-              />
-
-              <polygon
-                fill="url(#gradient)"
-                opacity="0.2"
-                points={
-                  chartData.map((d, i) => {
-                    const x = 80 + (i * (100 / (chartData.length - 1)) * 0.85);
-                    const y = 300 - ((d.value - minValue) / (maxValue - minValue)) * 240;
-                    return `${x}%,${y}`;
-                  }).join(' ') + ` 95%,300 5%,300`
-                }
-              />
-
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#3B82F6', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#3B82F6', stopOpacity: 0 }} />
-                </linearGradient>
-              </defs>
-
-              {chartData.map((d, i) => (
-                <text
-                  key={i}
-                  x={`${80 + (i * (100 / (chartData.length - 1)) * 0.85)}%`}
-                  y="290"
-                  fill="#6B7280"
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {d.month}
-                </text>
-              ))}
-            </svg>
-          </div>
+          )}
         </div>
       </div>
     </div>

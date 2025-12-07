@@ -66,12 +66,16 @@
 }
 
 .submit-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 32px;
+}
+
+.submit-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
+  align-items: start;
 }
 
 .submit-form {
@@ -293,8 +297,11 @@
 }
 
 @media (max-width: 900px) {
-  .submit-content {
+  .submit-layout {
     grid-template-columns: 1fr;
+  }
+  
+  .submit-content {
     padding: 1.5rem 16px;
   }
 

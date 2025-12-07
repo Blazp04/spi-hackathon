@@ -109,18 +109,20 @@ function AppContent() {
       {currentView === 'trading' && (
         <TradingScreen 
           project={selectedProject}
-          onBack={handleBackToMarketplace}
-          onMarket2={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
           onPortfolio={handlePortfolio}
           onMintTokens={handleMintTokens}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'portfolio' && (
         <Portfolio 
-          onBack={handleBackToMarketplace}
-          onMarket2={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
           onMintTokens={handleMintTokens}
           onTrading={handleTrading}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
     </div>
