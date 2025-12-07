@@ -63,12 +63,24 @@ function AppContent() {
         />
       )}
       {currentView === 'admin' && isAdmin && (
-        <AdminDashboard onBack={handleBackToMarketplace} />
+        <AdminDashboard 
+          onBack={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onMintTokens={handleMintTokens}
+          onTrading={handleTrading}
+          onPortfolio={handlePortfolio}
+          onSubmitProject={handleSubmitProject}
+        />
       )}
       {currentView === 'submit' && (
         <SubmitProject 
           onBack={handleBackToMarketplace}
           onSuccess={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onMintTokens={handleMintTokens}
+          onTrading={handleTrading}
+          onPortfolio={handlePortfolio}
+          onAdmin={handleAdminDashboard}
         />
       )}
       {currentView === 'details' && (
