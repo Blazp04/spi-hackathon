@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import './App.css';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ClientMarket from './components/client_market';
+import AdminDashboard from './components/AdminDashboard';
+import SubmitProject from './components/SubmitProject';
 import AssetDetails from './components/asset_details';
 import MintTokens from './components/mint_tokens';
-import TradingScreen from './components/trading_screen';
 import Portfolio from './components/portofolio';
+import TradingScreen from './components/trading_screen';
 
-function App() {
+function AppContent() {
+  const { isAdmin } = useAuth();
   const [currentView, setCurrentView] = useState('marketplace');
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -38,12 +42,12 @@ function App() {
     setSelectedProject(null);
   };
 
-  const handleBackToDetails = () => {
-    if (selectedProject) {
-      setCurrentView('details');
-    } else {
-      handleBackToMarketplace();
-    }
+  const handleAdminDashboard = () => {
+    setCurrentView('admin');
+  };
+
+  const handleSubmitProject = () => {
+    setCurrentView('submit');
   };
 
   return (
@@ -54,34 +58,82 @@ function App() {
           onMintTokens={handleMintTokens}
           onTrading={handleTrading}
           onPortfolio={handlePortfolio}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
+        />
+      )}
+      {currentView === 'admin' && isAdmin && (
+        <AdminDashboard 
+          onBack={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onMintTokens={handleMintTokens}
+          onTrading={handleTrading}
+          onPortfolio={handlePortfolio}
+          onSubmitProject={handleSubmitProject}
+        />
+      )}
+      {currentView === 'submit' && (
+        <SubmitProject 
+          onBack={handleBackToMarketplace}
+          onSuccess={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onMintTokens={handleMintTokens}
+          onTrading={handleTrading}
+          onPortfolio={handlePortfolio}
+          onAdmin={handleAdminDashboard}
         />
       )}
       {currentView === 'details' && (
         <AssetDetails 
-          project={selectedProject} 
+          project={selectedProject}
           onBack={handleBackToMarketplace}
           onMintTokens={handleMintTokens}
           onTrading={handleTrading}
+          onMarket2={handleBackToMarketplace}
+          onPortfolio={handlePortfolio}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'mint' && (
         <MintTokens 
-          project={selectedProject} 
-          onBack={handleBackToDetails}
+          project={selectedProject}
+          onBack={handleBackToMarketplace}
+          onMarket2={handleBackToMarketplace}
+          onPortfolio={handlePortfolio}
+          onTrading={handleTrading}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'trading' && (
         <TradingScreen 
           project={selectedProject}
-          onBack={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onPortfolio={handlePortfolio}
+          onMintTokens={handleMintTokens}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
       {currentView === 'portfolio' && (
         <Portfolio 
-          onBack={handleBackToMarketplace}
+          onMarketplace={handleBackToMarketplace}
+          onMintTokens={handleMintTokens}
+          onTrading={handleTrading}
+          onAdmin={handleAdminDashboard}
+          onSubmitProject={handleSubmitProject}
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
