@@ -77,7 +77,7 @@ const Portfolio = ({ onBack, onMintTokens, onTrading }) => {
               Connected
             </button>
             <div className="user-avatar">
-              <img src="https://via.placeholder.com/32" alt="User" />
+              <img src="https://ui-avatars.com/api/?name=User&size=32&background=3b82f6&color=fff" alt="User" />
             </div>
           </div>
         </div>
